@@ -1,0 +1,39 @@
+{
+  "name": "BBY 164 Toolbox",
+  "short_name": "BBY 164 Toolbox",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#fff",
+  "theme_color": "#",
+  "description": "A set of tools to help associates at the 164 Best Buy location.",
+  "icons": [{
+    "src": "/static/appicon/toolbox-icon_72.png",
+    "sizes": "72x72",
+    "type": "image/png"
+  },
+  {
+    "src": "/static/appicon/toolbox-icon_128.png",
+    "sizes": "128x128",
+    "type": "image/png"
+  },
+  {
+    "src": "/static/appicon/toolbox-icon_168.png",
+    "sizes": "168x168",
+    "type": "image/png"
+  },
+  {
+    "src": "/static/appicon/toolbox-icon_192.png",
+    "sizes": "192x192",
+    "type": "image/png"
+  },
+  {
+    "src": "/static/appicon/toolbox-icon_256.png",
+    "sizes": "256x256",
+    "type": "image/png"
+  },
+  {
+    "src": "/static/appicon/toolbox-icon_512.png",
+    "sizes": "512x512",
+    "type": "image/png"
+  } ]
+}

@@ -1,0 +1,15 @@
+[Unit]
+Description=David Clifton Ministries Internal Platform
+Documentation=https://github.com/kzaremski
+After=network.target
+
+[Service]
+WorkingDirectory=/home/dcmplatform/dcm-internal
+Environment=PORT=3000
+Type=simple
+User=dcmplatform
+ExecStart=/usr/bin/node /home/dcmplatform/dcm-internal/main.js
+Restart=on-failure
+
+[Install]
+WantedBy=multi-user.target
