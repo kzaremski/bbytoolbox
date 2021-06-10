@@ -93,4 +93,4 @@ mongoose.createConnection(process.env.MONGODB_URI, {
 app.get('/', (req, res) => { res.sendFile(path.join(__dirname, '/index.html')) });
 
 // Listen to HTTP requests
-app.listen(process.env.port || 3000, () => { console.log(`Express app listening at http://127.0.0.1:${(process.env.port || 3000)}`); });
+app.listen((process.env.PORT || 3000), () => { console.log(`Express app listening at http://127.0.0.1:${(process.env.PORT || 3000)}`); });
