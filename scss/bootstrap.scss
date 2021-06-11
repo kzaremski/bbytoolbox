@@ -158,6 +158,7 @@ $progress-height:               .5rem;
 }
 
 #splash {
+  z-index: 9999999999999999;
   background-color: rgb(21, 21, 255);
   position: fixed;
   top: 0;
@@ -187,4 +188,27 @@ $progress-height:               .5rem;
   display: inline;
   width: 130px;
   margin-bottom: 20px;
+}
+
+@keyframes fadeScaleOut {
+  0% {
+    opacity: 1;
+    transform: scale(1);
+  }
+  25% {
+    transform: scale(0.95);
+  }
+  50% {
+    opacity: 0.8;
+  }
+  100% {
+    opacity: 0;
+    transform: scale(0.95) translate(0, -100vh);
+  }
+}
+
+#splash.done {
+  animation-name: fadeScaleOut;
+  animation-duration: 0.5s;
+  opacity: 0;
 }

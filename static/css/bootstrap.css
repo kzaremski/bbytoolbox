@@ -9786,6 +9786,7 @@ h3 {
   }
 }
 #splash {
+  z-index: 10000000000000000;
   background-color: #1515ff;
   position: fixed;
   top: 0;
@@ -9815,6 +9816,28 @@ h3 {
   display: inline;
   width: 130px;
   margin-bottom: 20px;
+}
+
+@keyframes fadeScaleOut {
+  0% {
+    opacity: 1;
+    transform: scale(1);
+  }
+  25% {
+    transform: scale(0.95);
+  }
+  50% {
+    opacity: 0.8;
+  }
+  100% {
+    opacity: 0;
+    transform: scale(0.95) translate(0, -100vh);
+  }
+}
+#splash.done {
+  animation-name: fadeScaleOut;
+  animation-duration: 0.5s;
+  opacity: 0;
 }
 
 /*# sourceMappingURL=bootstrap.css.map */
