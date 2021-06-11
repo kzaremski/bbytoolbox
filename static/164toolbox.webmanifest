@@ -4,7 +4,7 @@
   "start_url": "/",
   "display": "standalone",
   "background_color": "#fff",
-  "theme_color": "#",
+  "theme_color": "#2780e3",
   "description": "A set of tools to help associates at the 164 Best Buy location.",
   "icons": [{
     "src": "/static/appicon/toolbox-icon_72.png",
