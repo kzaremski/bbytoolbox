@@ -56,6 +56,8 @@ app.use(helmet({ contentSecurityPolicy: false }));
 // Configure body parser
 app.use(bodyParser.urlencoded({ extended: true }), bodyParser.json());
 
+app.set('trust proxy', true);
+
 // Configure server side sessions
 if (app.get('env') === 'production') {
   app.set('trust proxy', 1);
@@ -71,6 +73,10 @@ if (app.get('env') === 'production') {
     saveUninitialized: true
   }));
 }
+
+// Mongoose models
+const IPAddress = require(path.join(__dirname, 'models/ipaddress'));
+const Employee = require(path.join(__dirname, 'models/employee'));
 
 // Static assets and files
 app.use('/static', express.static(path.join(__dirname, 'static')));
@@ -91,6 +97,55 @@ mongoose.createConnection(process.env.MONGODB_URI, {
 
 // All regular HTTP requests are delivered the main view
 app.get('/', (req, res) => { res.sendFile(path.join(__dirname, '/index.html')) });
+
+// Get current account status
+app.post('/currentuser', (req, res) => {
+  res.send({
+    employeenumber: req.session.employeenumber,
+    employeename: req.session.employeename,
+  });
+});
+
+// Login database operations
+async function login(employeenumber, ipaddress) {
+  try {
+    if (employeenumber === null || typeof employeenumber != 'string' || employeenumber.length != ) throw 'Employee number is not valid.';
+    let employee = await Employee.findOne({ number: employeenumber.trim() });
+    if (!employee) throw 'Employee number is not valid.';
+    if (employee.disabled) throw 'Access has been disabled for this employee number.';
+    return {
+      success: true,
+      name: employee.name,
+      number: employee.number
+    };
+  } catch(err) {
+    return { error: String(err) };
+  }
+}
+
+// Login API endpoint
+app.post('/login', (req, res) => {
+  if (!req.body.employeenumber) return res.send({ error: 'Employee number is not valid.' });
+  login(req.body.employeenumber, req.ip).then((response) => {
+    if (response.success) {
+      // Record the login
+      Login.save({
+        ip: ipaddress,
+        date: new Date(),
+        employee: employee.number
+      });
+      // Set the server side session
+      req.session.employeename = response.name;
+      req.session.employeenumber = response.number;
+    }
+    res.send(response);
+  });
+});
+
+app.post('/logout', (req, res) => {
+  req.session.destroy();
+  res.send({ success: true });
+})
 
 // Listen to HTTP requests
 app.listen((process.env.PORT || 3000), () => { console.log(`Express app listening at http://127.0.0.1:${(process.env.PORT || 3000)}`); });

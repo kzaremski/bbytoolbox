@@ -22,28 +22,64 @@ class App extends Component {
 
     // Setting the initial state
     this.state = {
-      user: null,
       loaded: false
     }
+
+    // Bind local methods to global variables
+    window.checkLoginStatus = this.checkLoginStatus;
+  }
+
+  // Makes a backend request, mutates the related global variables, and returns the results
+  async checkLoginStatus() {
+    try {
+      // Query the backend
+      const account = await fetch('/', {
+        method: 'POST',
+        mode: 'same-origin',
+        cache: 'no-cache',
+        credentials: 'same-origin',
+        headers: {
+          'Content-Type': 'application/json'
+        }
+      }).then(response => response.json());
+      // Set the global variables
+      window.employeenumber = account.employeename;
+      window.employeename = account.employeenumber;
+    } catch(err) {
+      // Set the global variables
+      window.employeenumber = null;
+      window.employeename = null;
+    }
+    // Return results
+    return {
+      employeenumber: window.employeenumber,
+      employeename: window.employeename
+    };
   }
 
   componentDidMount() {
-    let splashscreen = document.getElementById('splash');
-    setTimeout(() => {
-      splashscreen.classList.add('done');
-      // Remove the splash screen after it is done animating out.
-      setTimeout(() => { splashscreen.parentNode.removeChild(splashscreen) }, 500);
-    }, 1000);
+    this.checkLoginStatus().then(this.setState({ loaded: true }, () => {
+      let splashscreen = document.getElementById('splash');
+      setTimeout(() => {
+        splashscreen.classList.add('done');
+        // Remove the splash screen after it is done animating out.
+        setTimeout(() => { splashscreen.parentNode.removeChild(splashscreen) }, 500);
+      }, 1000);
+    }));
   }
   
   render() {
     return (
-      <>
+      <Router>
         <Navbar/>
-        <div className="container pt-3" style={{ 'margin-top': '61px' }}>
-          <Login/>
+        <div className="container pt-3" style={{ 'marginTop': '61px' }}>
+          { this.state.loaded && window.employeenumber == null ? <Login/> : <>
+            <Switch>
+
+            </Switch>
+          </> }
         </div>
-      </>
+      </Router>
     );
   }
 }
