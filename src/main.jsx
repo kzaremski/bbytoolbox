@@ -15,6 +15,9 @@ import ReactDOM from 'react-dom';
 import Navbar from './navbar.jsx';
 import Login from './login.jsx';
 
+// Routes
+import Home from './home.jsx';
+
 // The main App component
 class App extends Component {
   constructor(props) {
@@ -22,10 +25,12 @@ class App extends Component {
 
     // Setting the initial state
     this.state = {
-      loaded: false
+      loaded: false,
+      employeenumber: null
     }
 
     // Bind local methods to global variables
+    this.checkLoginStatus = this.checkLoginStatus.bind(this);
     window.checkLoginStatus = this.checkLoginStatus;
   }
 
@@ -33,7 +38,7 @@ class App extends Component {
   async checkLoginStatus() {
     try {
       // Query the backend
-      const account = await fetch('/', {
+      const account = await fetch('/currentuser', {
         method: 'POST',
         mode: 'same-origin',
         cache: 'no-cache',
@@ -43,18 +48,17 @@ class App extends Component {
         }
       }).then(response => response.json());
       // Set the global variables
-      window.employeenumber = account.employeename;
-      window.employeename = account.employeenumber;
+      window.employeenumber = account.employeenumber;
+      window.employeename = account.employeename;
     } catch(err) {
       // Set the global variables
       window.employeenumber = null;
       window.employeename = null;
     }
-    // Return results
-    return {
+    this.setState({
       employeenumber: window.employeenumber,
       employeename: window.employeename
-    };
+    });
   }
 
   componentDidMount() {
@@ -73,9 +77,9 @@ class App extends Component {
       <Router>
         <Navbar/>
         <div className="container pt-3" style={{ 'marginTop': '61px' }}>
-          { this.state.loaded && window.employeenumber == null ? <Login/> : <>
+          { this.state.loaded && this.state.employeenumber == null ? <Login/> : <>
             <Switch>
-
+              <Route path="/" exact component={Home}/>
             </Switch>
           </> }
         </div>

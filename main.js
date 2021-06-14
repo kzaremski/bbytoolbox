@@ -74,26 +74,25 @@ if (app.get('env') === 'production') {
   }));
 }
 
-// Mongoose models
-const IPAddress = require(path.join(__dirname, 'models/ipaddress'));
-const Employee = require(path.join(__dirname, 'models/employee'));
-
 // Static assets and files
 app.use('/static', express.static(path.join(__dirname, 'static')));
 app.use('/build', express.static(path.join(__dirname, 'build')));
 
-// Connect to database
-mongoose.createConnection(process.env.MONGODB_URI, {
+// Connect to the MongoDB database
+mongoose.connect(process.env.MONGODB_URI, {
   useNewUrlParser: true, 
   useUnifiedTopology: true,
   useFindAndModify: false
 }, (err) => {
   // If there was an error, obviously we are not connected
-  if (!err) {
-    return console.log('Connected to MongoDB');
-  }
+  if (!err) return console.log('Connected to MongoDB');
   console.log('Unable to connect to MongoDB');
 });
+
+// Mongoose models
+const Employee = require(path.join(__dirname, 'models/employee'));
+const IPAddress = require(path.join(__dirname, 'models/ipaddress'));
+const Login = require(path.join(__dirname, 'models/login'));
 
 // All regular HTTP requests are delivered the main view
 app.get('/', (req, res) => { res.sendFile(path.join(__dirname, '/index.html')) });
@@ -107,12 +106,12 @@ app.post('/currentuser', (req, res) => {
 });
 
 // Login database operations
-async function login(employeenumber, ipaddress) {
+async function login(employeenumber) {
   try {
-    if (employeenumber === null || typeof employeenumber != 'string' || employeenumber.length != ) throw 'Employee number is not valid.';
+    if (employeenumber === null || typeof employeenumber != 'string' || employeenumber.length < 1) throw 'Employee number is not valid';
     let employee = await Employee.findOne({ number: employeenumber.trim() });
-    if (!employee) throw 'Employee number is not valid.';
-    if (employee.disabled) throw 'Access has been disabled for this employee number.';
+    if (!employee) throw 'Employee number is not valid';
+    if (employee.disabled) throw 'Access has been disabled for this employee number';
     return {
       success: true,
       name: employee.name,
@@ -125,14 +124,14 @@ async function login(employeenumber, ipaddress) {
 
 // Login API endpoint
 app.post('/login', (req, res) => {
-  if (!req.body.employeenumber) return res.send({ error: 'Employee number is not valid.' });
-  login(req.body.employeenumber, req.ip).then((response) => {
+  if (!req.body.employeenumber) return res.send({ error: 'Employee number is not valid' });
+  login(req.body.employeenumber).then((response) => {
     if (response.success) {
       // Record the login
-      Login.save({
-        ip: ipaddress,
+      Login.create({
+        ip: req.ip,
         date: new Date(),
-        employee: employee.number
+        employee: response.number
       });
       // Set the server side session
       req.session.employeename = response.name;
