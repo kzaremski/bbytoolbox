@@ -95,7 +95,7 @@ const IPAddress = require(path.join(__dirname, 'models/ipaddress'));
 const Login = require(path.join(__dirname, 'models/login'));
 
 // All regular HTTP requests are delivered the main view
-app.get('/', (req, res) => { res.sendFile(path.join(__dirname, '/index.html')) });
+app.get('*', (req, res) => { res.sendFile(path.join(__dirname, '/index.html')) });
 
 // Get current account status
 app.post('/currentuser', (req, res) => {

@@ -17,6 +17,7 @@ import Login from './login.jsx';
 
 // Routes
 import Home from './home.jsx';
+import SaleUnitTracker from './unittracker.jsx';
 
 // The main App component
 class App extends Component {
@@ -80,6 +81,7 @@ class App extends Component {
           { this.state.loaded && this.state.employeenumber == null ? <Login/> : <>
             <Switch>
               <Route path="/" exact component={Home}/>
+              <Route path="/saletracker" exact component={SaleUnitTracker}/>
             </Switch>
           </> }
         </div>
