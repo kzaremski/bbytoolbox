@@ -1,14 +1,14 @@
 [Unit]
-Description=David Clifton Ministries Internal Platform
-Documentation=https://github.com/kzaremski
+Description=Best Buy 164 Toolbox
+Documentation=https://github.com/kzaremski/164-toolbox
 After=network.target
 
 [Service]
-WorkingDirectory=/home/dcmplatform/dcm-internal
+WorkingDirectory=/home/node/164-toolbox
 Environment=PORT=3000
 Type=simple
-User=dcmplatform
-ExecStart=/usr/bin/node /home/dcmplatform/dcm-internal/main.js
+User=node
+ExecStart=/usr/bin/node /home/node/164-toolbox/main.js
 Restart=on-failure
 
 [Install]
