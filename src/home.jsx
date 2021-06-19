@@ -57,7 +57,7 @@ export default class Home extends React.Component {
             </div>
             <div className="pl-3 text-dark">
               <h5>Computing Sale Unit Tracker</h5>
-              <p className="m-0">Track services, memberships, and device sales in the Computing department.</p>
+              <p className="m-0">Track services, memberships, and device sales in the computing department.</p>
             </div>
           </div>
         </Link>
