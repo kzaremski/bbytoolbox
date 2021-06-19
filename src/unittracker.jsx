@@ -60,14 +60,14 @@ export default class SaleUnitTracker extends React.Component {
 
   // Increment and decrement unit counts for the new sale dialog
   incrementUnit(event) {
-    const unit = event.target.name;
+    const unit = event.currentTarget.name;
     let newsale = this.state.newsale;
     newsale[unit] = newsale[unit] + 1;
     this.setState({ newsale: newsale });
   }
 
   decrementUnit(event) {
-    const unit = event.target.name;
+    const unit = event.currentTarget.name;
     let newsale = this.state.newsale;
     newsale[unit] = newsale[unit] > 0 ? newsale[unit] - 1 : 0;
     this.setState({ newsale: newsale });
