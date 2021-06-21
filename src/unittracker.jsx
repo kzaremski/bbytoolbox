@@ -75,11 +75,28 @@ export default class SaleUnitTracker extends React.Component {
 
   // Submit the new sale
   async submitSale() {
+    this.setState({ saving: true });
+    let data = {};
     try {
-
-    } catch(err) {
-
+      // Load data
+      let response = await fetch('/saletracker/submitsale', {
+        method: 'POST',
+        mode: 'same-origin',
+        cache: 'no-cache',
+        credentials: 'same-origin',
+        body: JSON.stringify({ sale: this.state.newsale }),
+        headers: {
+          'Content-Type': 'application/json'
+        }
+      }).then(response => response.json());
+      data = { ...response, loaded: true };
+    } catch (err) {
+      console.log(err);
+      if (response) console.log(response);
+      data = { error: 'There was an error parsing the response from the backend. Possible errors: 404, 500.' };
     }
+
+    this.setState(data);
   }
 
   render() {
@@ -183,7 +200,16 @@ export default class SaleUnitTracker extends React.Component {
           </table>
         </div>
 
-        <Modal show={this.state.newsale !== null} onHide={this.closeNewSale}>
+        <Modal show={this.state.saving} size="sm">
+          <Modal.Body className="bg-warning">
+            <div className="d-flex flex-direction-column align-items-center justify-content-middle">
+              <div class="lds-roller mx-auto"><div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div></div>
+            </div>
+            <h5 className="text-center text-white mb-0 mt-3 d-block">Saving Changes</h5>
+          </Modal.Body>
+        </Modal>
+
+        <Modal show={this.state.newsale !== null && !this.state.saving} onHide={this.closeNewSale}>
           <Modal.Header closeButton>
             <Modal.Title>New Sale</Modal.Title>
           </Modal.Header>
@@ -227,7 +253,7 @@ export default class SaleUnitTracker extends React.Component {
           </Modal.Body>
           <Modal.Footer>
             <Button variant="secondary" onClick={this.closeNewSale}>Cancel</Button>
-            <Button variant="primary">Submit</Button>
+            <Button variant="primary" onClick={this.submitSale}>Submit</Button>
           </Modal.Footer>
         </Modal>
       </>
