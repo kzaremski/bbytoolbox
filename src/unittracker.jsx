@@ -296,35 +296,45 @@ export default class SaleUnitTracker extends React.Component {
               Your employee number is automatically added to the record of the sale upon submission.
             </p>
             {this.state.newsale !== null ? <>
-              <div className="row mb-2">
-                <div className="col-7 mt-2">Windows OEM</div>
-                <div className="col-2"><Button variant="danger" block disabled={this.state.newsale.oem < 1} onClick={this.decrementUnit} name="oem"><strong>-</strong></Button></div>
-                <div className="col-1"><h5 className="mt-2">{this.state.newsale.oem}</h5></div>
-                <div className="col-2"><Button variant="success" block disabled={this.state.newsale.oem >= 10} onClick={this.incrementUnit} name="oem"><strong>+</strong></Button></div>
+              <div className="d-flex flex-direction-row mb-2">
+                <div className="flex-grow-1 w-75 pt-2">Windows OEM</div>
+                <div className="flex-shrink-0 ml-3 d-flex flex-direction-row w-25">
+                  <Button variant="danger" className="col-4" block disabled={this.state.newsale.oem < 1} onClick={this.decrementUnit} name="oem"><strong>-</strong></Button>
+                  <h5 className="mt-2 col-4 p-0 text-center">{this.state.newsale.oem}</h5>
+                  <Button variant="success" className="col-4" block disabled={this.state.newsale.oem >= 10} onClick={this.incrementUnit} name="oem"><strong>+</strong></Button>
+                </div>
               </div>
-              <div className="row mb-2">
-                <div className="col-7 mt-2">Microsoft 365 &amp; Office</div>
-                <div className="col-2"><Button variant="danger" block disabled={this.state.newsale.office < 1} onClick={this.decrementUnit} name="office"><strong>-</strong></Button></div>
-                <div className="col-1"><h5 className="mt-2">{this.state.newsale.office}</h5></div>
-                <div className="col-2"><Button variant="success" block disabled={this.state.newsale.office >= 10} onClick={this.incrementUnit} name="office"><strong>+</strong></Button></div>
+              <div className="d-flex flex-direction-row mb-2">
+                <div className="flex-grow-1 w-75 pt-2">Microsoft 365 &amp; Office</div>
+                <div className="flex-shrink-0 ml-3 d-flex flex-direction-row w-25">
+                  <Button variant="danger" className="col-4" block disabled={this.state.newsale.office < 1} onClick={this.decrementUnit} name="office"><strong>-</strong></Button>
+                  <h5 className="mt-2 col-4 p-0 text-center">{this.state.newsale.office}</h5>
+                  <Button variant="success" className="col-4" block disabled={this.state.newsale.office >= 10} onClick={this.incrementUnit} name="office"><strong>+</strong></Button>
+                </div>
               </div>
-              <div className="row mb-2">
-                <div className="col-7 mt-2">Microsoft Surface Devices</div>
-                <div className="col-2"><Button variant="danger" block disabled={this.state.newsale.surface < 1} onClick={this.decrementUnit} name="surface"><strong>-</strong></Button></div>
-                <div className="col-1"><h5 className="mt-2">{this.state.newsale.surface}</h5></div>
-                <div className="col-2"><Button variant="success" block disabled={this.state.newsale.surface >= 5} onClick={this.incrementUnit} name="surface"><strong>+</strong></Button></div>
+              <div className="d-flex flex-direction-row mb-2">
+                <div className="flex-grow-1 w-75 pt-2">Microsoft Surface Devices</div>
+                <div className="flex-shrink-0 ml-3 d-flex flex-direction-row w-25">
+                  <Button variant="danger" className="col-4" block disabled={this.state.newsale.surface < 1} onClick={this.decrementUnit} name="surface"><strong>-</strong></Button>
+                  <h5 className="mt-2 col-4 p-0 text-center">{this.state.newsale.surface}</h5>
+                  <Button variant="success" className="col-4" block disabled={this.state.newsale.surface >= 5} onClick={this.incrementUnit} name="surface"><strong>+</strong></Button>
+                </div>
               </div>
-              <div className="row mb-2">
-                <div className="col-7 mt-2">Total Tech Support</div>
-                <div className="col-2"><Button variant="danger" block disabled={this.state.newsale.tts < 1} onClick={this.decrementUnit} name="tts"><strong>-</strong></Button></div>
-                <div className="col-1"><h5 className="mt-2">{this.state.newsale.tts}</h5></div>
-                <div className="col-2"><Button variant="success" block disabled={this.state.newsale.tts >= 2} onClick={this.incrementUnit} name="tts"><strong>+</strong></Button></div>
+              <div className="d-flex flex-direction-row mb-2">
+                <div className="flex-grow-1 w-75 pt-2">Total Tech Support</div>
+                <div className="flex-shrink-0 ml-3 d-flex flex-direction-row w-25">
+                  <Button variant="danger" className="col-4" block disabled={this.state.newsale.tts < 1} onClick={this.decrementUnit} name="tts"><strong>-</strong></Button>
+                  <h5 className="mt-2 col-4 p-0 text-center">{this.state.newsale.tts}</h5>
+                  <Button variant="success" className="col-4" block disabled={this.state.newsale.tts >= 2} onClick={this.incrementUnit} name="tts"><strong>+</strong></Button>
+                </div>
               </div>
-              <div className="row mb-2">
-                <div className="col-7 mt-2">Best Buy Card Applications</div>
-                <div className="col-2"><Button variant="danger" block disabled={this.state.newsale.bp < 1} onClick={this.decrementUnit} name="bp"><strong>-</strong></Button></div>
-                <div className="col-1"><h5 className="mt-2">{this.state.newsale.bp}</h5></div>
-                <div className="col-2"><Button variant="success" block disabled={this.state.newsale.bp >= 3} onClick={this.incrementUnit} name="bp"><strong>+</strong></Button></div>
+              <div className="d-flex flex-direction-row">
+                <div className="flex-grow-1 w-75 pt-2">Best Buy Card Applications</div>
+                <div className="flex-shrink-0 ml-3 d-flex flex-direction-row w-25">
+                  <Button variant="danger" className="col-4" block disabled={this.state.newsale.bp < 1} onClick={this.decrementUnit} name="bp"><strong>-</strong></Button>
+                  <h5 className="mt-2 col-4 p-0 text-center">{this.state.newsale.bp}</h5>
+                  <Button variant="success" className="col-4" block disabled={this.state.newsale.bp >= 3} onClick={this.incrementUnit} name="bp"><strong>+</strong></Button>
+                </div>
               </div>
             </> : null}
           </Modal.Body>
