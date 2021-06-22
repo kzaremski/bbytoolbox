@@ -97,6 +97,9 @@ const Login = require(path.join(__dirname, 'models/login'));
 // All regular HTTP requests are delivered the main view
 app.get('*', (req, res) => { res.sendFile(path.join(__dirname, '/index.html')) });
 
+// Applications
+app.use('/saletracker', require('./saletracker.js'));
+
 // Get current account status
 app.post('/currentuser', (req, res) => {
   res.send({

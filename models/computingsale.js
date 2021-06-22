@@ -7,18 +7,18 @@ const mongoose = require('mongoose');
 const Schema = mongoose.Schema;
 
 let ComputingSaleSchema = new Schema({
-  date: String,
+  date: Date,
   employee: {
     name: String,
     number: String
   },
   units: {
-    oem: 0,
-    office: 0,
-    surface: 0,
-    tts: 0,
-    bp: 0
+    oem: Number,
+    office: Number,
+    surface: Number,
+    tts: Number,
+    bp: Number
   }
 });
 
-module.exports = mongoose.model('ipaddress', ComputingSaleSchema);
+module.exports = mongoose.model('computingsale', ComputingSaleSchema);
