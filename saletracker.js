@@ -57,8 +57,8 @@ router.post('/getsales', async (req, res) => {
     if (!req.session.employeenumber) throw 'Session expired, you are not authenticated.';
     // Identify bounding datetimes
     const now = utcToZonedTime(new Date().toISOString(), 'America/Denver');
-    const begin = startOfDay(now);
-    const end = endOfDay(now);
+    const begin = zonedTimeToUtc(startOfDay(now).toISOString(), 'America/Denver');
+    const end = zonedTimeToUtc(endOfDay(now).toISOString(), 'America/Denver');
     // Find all matching documents using a MongoDB aggregation pipeline
     let sales = await ComputingSale.aggregate([{
       "$match": {
