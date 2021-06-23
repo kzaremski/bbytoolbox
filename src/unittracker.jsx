@@ -118,7 +118,10 @@ export default class SaleUnitTracker extends React.Component {
           mode: 'same-origin',
           cache: 'no-cache',
           credentials: 'same-origin',
-          body: JSON.stringify({ sale: this.state.newsale }),
+          body: JSON.stringify({
+            sale: this.state.newsale,
+            timezone: Intl.DateTimeFormat().resolvedOptions().timeZone
+           }),
           headers: {
             'Content-Type': 'application/json'
           }
@@ -250,7 +253,7 @@ export default class SaleUnitTracker extends React.Component {
               </tr>
             </thead>
             <tbody>
-              { salesbyemployee === {} ? <tr>
+              { Object.keys(salesbyemployee).length === 0 ? <tr>
                 <td>No sales have been recorded yet.</td>
                 <td></td>
                 <td></td>

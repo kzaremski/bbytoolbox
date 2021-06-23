@@ -7,6 +7,7 @@
 
 // Import dependencies
 import React from 'react';
+import { Redirect } from 'react-router-dom';
 
 export default class Login extends React.Component {
   constructor(props) {
@@ -80,6 +81,7 @@ export default class Login extends React.Component {
   render() {
     return (
       <>
+        <Redirect to='/'/>
         <div className="d-flex flex-direction-row">
           <div className="col-md-8 col-lg-6 p-0 mx-auto">
             <div className="card bg-light mb-3">
