@@ -37,7 +37,8 @@ router.post('/submitsale', async (req, res) => {
     };
     // Build the new sale object and create a document within the database collection
     const sale = {
-      date: new Date(),
+      // Hard assumption of mountain time
+      date: utcToZonedTime(new Date().toISOString, 'America/Denver'),
       employee: employee,
       units: units
     }
@@ -56,9 +57,9 @@ router.post('/getsales', async (req, res) => {
     // Authenticate user
     if (!req.session.employeenumber) throw 'Session expired, you are not authenticated.';
     // Identify bounding datetimes
-    const now = utcToZonedTime(new Date().toISOString(), 'America/Denver');
-    const begin = zonedTimeToUtc(startOfDay(now).toISOString(), 'America/Denver');
-    const end = zonedTimeToUtc(endOfDay(now).toISOString(), 'America/Denver');
+    const now = new Date();
+    const begin = startOfDay(now);
+    const end = endOfDay(now);
     // Find all matching documents using a MongoDB aggregation pipeline
     let sales = await ComputingSale.aggregate([{
       "$match": {
