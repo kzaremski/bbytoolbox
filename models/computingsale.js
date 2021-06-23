@@ -1,5 +1,5 @@
 /*
-  IP Address Mongoose Model/Schema
+  Computing Sale Mongoose Model/Schema
 */
 
 // Mongoose package & schema object

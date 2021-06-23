@@ -46,12 +46,18 @@ export default class SaleUnitTracker extends React.Component {
 
     // Bind this to component methods
     this.updateCurrentSales = this.updateCurrentSales.bind(this);
-
-    this.openNewSale = this.openNewSale.bind(this);
-    this.closeNewSale = this.closeNewSale.bind(this);
-    this.incrementUnit = this.incrementUnit.bind(this);
-    this.decrementUnit = this.decrementUnit.bind(this);
-    this.submitSale = this.submitSale.bind(this);
+    // New Sale Functionality
+    this.openNewSale    = this.openNewSale.bind(this);
+    this.closeNewSale   = this.closeNewSale.bind(this);
+    this.incrementUnit  = this.incrementUnit.bind(this);
+    this.decrementUnit  = this.decrementUnit.bind(this);
+    this.submitSale     = this.submitSale.bind(this);
+    // Goal Modification
+    this.openEditGoals  = this.openEditGoals.bind(this);
+    this.closeEditGoals = this.closeEditGoals.bind(this);
+    this.incrementGoal  = this.incrementGoal.bind(this);
+    this.decrementGoal  = this.decrementGoal.bind(this);
+    this.submitGoals    = this.submitGoals.bind(this);
   }
 
   // Update current sales
@@ -70,6 +76,7 @@ export default class SaleUnitTracker extends React.Component {
           }
         }).then(response => response.json());
         data = response;
+        if (!data.goals) data.goals = this.state.goals;
       } catch (err) {
         console.log(err);
         if (response) console.log(response);
@@ -138,6 +145,55 @@ export default class SaleUnitTracker extends React.Component {
     });
   }
 
+  // Open/Close Goal Editor
+  closeEditGoals() { this.setState({ prevgoals: null }) }
+  openEditGoals() { this.setState({ prevgoals: JSON.parse(JSON.stringify(this.state.goals)) }) }
+
+  // Increment and decrement unit counts for sales goals
+  incrementGoal(event) {
+    const unit = event.currentTarget.name;
+    let goals = this.state.prevgoals;
+    goals[unit] = goals[unit] + 1;
+    this.setState({ prevgoals: goals });
+  }
+
+  decrementGoal(event) {
+    const unit = event.currentTarget.name;
+    let goals = this.state.prevgoals;
+    goals[unit] = goals[unit] > 0 ? goals[unit] - 1 : 0;
+    this.setState({ prevgoals: goals });
+  }
+
+  // Submit the new sale
+  async submitGoals() {
+    this.setState({ saving: true }, async () => {
+      let data = {};
+      try {
+        // Load data
+        let response = await fetch('/saletracker/submitgoals', {
+          method: 'POST',
+          mode: 'same-origin',
+          cache: 'no-cache',
+          credentials: 'same-origin',
+          body: JSON.stringify({
+            goals: this.state.prevgoals,
+           }),
+          headers: {
+            'Content-Type': 'application/json'
+          }
+        }).then(response => response.json());
+        data = response;
+      } catch (err) {
+        console.log(err);
+        if (response) console.log(response);
+        data = { error: 'There was an error parsing the response from the backend. Possible errors: 404, 500.' };
+      }
+      
+      this.setState({ ...data, saving: false, prevgoals: null });
+      this.updateCurrentSales();
+    });
+  }
+
   render() {
     // Add all units from individual sales into unified counts
     let salestoday = {
@@ -174,11 +230,11 @@ export default class SaleUnitTracker extends React.Component {
     return (
       <>
         <h5><strong>COMPUTING SALE UNIT TRACKER</strong></h5>
-        { this.state.updating ? <Alert variant="warning">Please wait while sales are loading</Alert> : null }
+        { this.state.updating ? <Alert variant="warning">Please wait while sales and goals are loaded</Alert> : null }
         { this.state.error ? <Alert variant="danger" onClose={() => { this.setState({ error: null }) }} dismissible>{this.state.error}</Alert> : null }
         { this.state.success ? <Alert variant="success" onClose={() => { this.setState({ success: null }) }} dismissible>{this.state.success}</Alert> : null }
         <div>
-          <button disabled className="btn btn-info mr-2 mb-2">Set Goals</button>
+          <button className="btn btn-info mr-2 mb-2" onClick={this.openEditGoals}>Set Goals</button>
           <button disabled className="btn btn-warning mr-2 mb-2">EOD Report</button>
           <button className="btn btn-success mb-2" onClick={this.openNewSale}>New Sale</button>
         </div>
@@ -214,27 +270,27 @@ export default class SaleUnitTracker extends React.Component {
               <tr>
                 <td>Windows OEM</td>
                 <td>{salestoday.oem}</td>
-                <td>N/A</td>
+                <td>{this.state.goals.oem || 'N/A'}</td>
               </tr>
               <tr>
                 <td>Microsoft 365 &amp; Office</td>
                 <td>{salestoday.office}</td>
-                <td>N/A</td>
+                <td>{this.state.goals.office || 'N/A'}</td>
               </tr>
               <tr>
                 <td>Microsoft Surface Devices</td>
                 <td>{salestoday.surface}</td>
-                <td>N/A</td>
+                <td>{this.state.goals.surface || 'N/A'}</td>
               </tr>
               <tr>
                 <td>Total Tech Support</td>
                 <td>{salestoday.tts}</td>
-                <td>N/A</td>
+                <td>{this.state.goals.tts || 'N/A'}</td>
               </tr>
               <tr>
                 <td>Best Buy Card Applications</td>
                 <td>{salestoday.bp}</td>
-                <td>N/A</td>
+                <td>{this.state.goals.bp || 'N/A'}</td>
               </tr>
             </tbody>
           </table>
@@ -344,6 +400,63 @@ export default class SaleUnitTracker extends React.Component {
           <Modal.Footer>
             <Button variant="secondary" onClick={this.closeNewSale}>Cancel</Button>
             <Button variant="primary" onClick={this.submitSale} disabled={ totalnewsales == 0 }>Submit</Button>
+          </Modal.Footer>
+        </Modal>
+
+        <Modal show={this.state.prevgoals !== null && !this.state.saving} onHide={this.closeNewSale}>
+          <Modal.Header closeButton>
+            <Modal.Title>Set Goals</Modal.Title>
+          </Modal.Header>
+          <Modal.Body>
+            <p>
+              Increment how many units of each category should be set as a goal for today's operation.
+            </p>
+            {this.state.prevgoals !== null ? <>
+              <div className="d-flex flex-direction-row mb-2">
+                <div className="flex-grow-1 w-75 pt-2">Windows OEM</div>
+                <div className="flex-shrink-0 ml-3 d-flex flex-direction-row w-25">
+                  <Button variant="danger" className="col-4 px-0 text-center" block disabled={this.state.prevgoals.oem < 1} onClick={this.decrementGoal} name="oem"><strong>-</strong></Button>
+                  <h5 className="mt-2 col-4 p-0 text-center">{this.state.prevgoals.oem}</h5>
+                  <Button variant="success" className="col-4 px-0 text-center" block disabled={this.state.prevgoals.oem >= 50} onClick={this.incrementGoal} name="oem"><strong>+</strong></Button>
+                </div>
+              </div>
+              <div className="d-flex flex-direction-row mb-2">
+                <div className="flex-grow-1 w-75 pt-2">Microsoft 365 &amp; Office</div>
+                <div className="flex-shrink-0 ml-3 d-flex flex-direction-row w-25">
+                  <Button variant="danger" className="col-4 px-0 text-center" block disabled={this.state.prevgoals.office < 1} onClick={this.decrementGoal} name="office"><strong>-</strong></Button>
+                  <h5 className="mt-2 col-4 p-0 text-center">{this.state.prevgoals.office}</h5>
+                  <Button variant="success" className="col-4 px-0 text-center" block disabled={this.state.prevgoals.office >= 50} onClick={this.incrementGoal} name="office"><strong>+</strong></Button>
+                </div>
+              </div>
+              <div className="d-flex flex-direction-row mb-2">
+                <div className="flex-grow-1 w-75 pt-2">Microsoft Surface Devices</div>
+                <div className="flex-shrink-0 ml-3 d-flex flex-direction-row w-25">
+                  <Button variant="danger" className="col-4 px-0 text-center" block disabled={this.state.prevgoals.surface < 1} onClick={this.decrementGoal} name="surface"><strong>-</strong></Button>
+                  <h5 className="mt-2 col-4 p-0 text-center">{this.state.prevgoals.surface}</h5>
+                  <Button variant="success" className="col-4 px-0 text-center" block disabled={this.state.prevgoals.surface >= 50} onClick={this.incrementGoal} name="surface"><strong>+</strong></Button>
+                </div>
+              </div>
+              <div className="d-flex flex-direction-row mb-2">
+                <div className="flex-grow-1 w-75 pt-2">Total Tech Support</div>
+                <div className="flex-shrink-0 ml-3 d-flex flex-direction-row w-25">
+                  <Button variant="danger" className="col-4 px-0 text-center" block disabled={this.state.prevgoals.tts < 1} onClick={this.decrementGoal} name="tts"><strong>-</strong></Button>
+                  <h5 className="mt-2 col-4 p-0 text-center">{this.state.prevgoals.tts}</h5>
+                  <Button variant="success" className="col-4 px-0 text-center" block disabled={this.state.prevgoals.tts >= 50} onClick={this.incrementGoal} name="tts"><strong>+</strong></Button>
+                </div>
+              </div>
+              <div className="d-flex flex-direction-row">
+                <div className="flex-grow-1 w-75 pt-2">Best Buy Card Applications</div>
+                <div className="flex-shrink-0 ml-3 d-flex flex-direction-row w-25">
+                  <Button variant="danger" className="col-4 px-0 text-center" block disabled={this.state.prevgoals.bp < 1} onClick={this.decrementGoal} name="bp"><strong>-</strong></Button>
+                  <h5 className="mt-2 col-4 p-0 text-center">{this.state.prevgoals.bp}</h5>
+                  <Button variant="success" className="col-4 px-0 text-center" block disabled={this.state.prevgoals.bp >= 50} onClick={this.incrementGoal} name="bp"><strong>+</strong></Button>
+                </div>
+              </div>
+            </> : null}
+          </Modal.Body>
+          <Modal.Footer>
+            <Button variant="secondary" onClick={this.closeEditGoals}>Cancel</Button>
+            <Button variant="primary" onClick={this.submitGoals} disabled={ this.state.prevgoals === this.state.goals }>Save Goals</Button>
           </Modal.Footer>
         </Modal>
       </>
