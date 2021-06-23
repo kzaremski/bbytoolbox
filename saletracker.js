@@ -38,7 +38,7 @@ router.post('/submitsale', async (req, res) => {
     // Build the new sale object and create a document within the database collection
     const sale = {
       // Hard assumption of mountain time
-      date: utcToZonedTime(new Date().toISOString, 'America/Denver'),
+      date: utcToZonedTime(new Date().toISOString(), 'America/Denver'),
       employee: employee,
       units: units
     }
