@@ -10,6 +10,7 @@ const path = require('path');
 const mongoose = require('mongoose');
 const startOfDay = require('date-fns/startOfDay');
 const endOfDay = require('date-fns/endOfDay');
+const { zonedTimeToUtc, utcToZonedTime } = require('date-fns-tz');
 
 const router = require('express').Router();
 
@@ -55,7 +56,7 @@ router.post('/getsales', async (req, res) => {
     // Authenticate user
     if (!req.session.employeenumber) throw 'Session expired, you are not authenticated.';
     // Identify bounding datetimes
-    const now = new Date();
+    const now = utcToZonedTime(new Date().toISOString(), 'America/Denver');
     const begin = startOfDay(now);
     const end = endOfDay(now);
     // Find all matching documents using a MongoDB aggregation pipeline
