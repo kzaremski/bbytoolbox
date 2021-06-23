@@ -26,7 +26,7 @@ router.post('/submitsale', async (req, res) => {
     // New sale
     let units = {};
     const allowedunits = ['oem', 'office', 'surface', 'tts', 'bp'];
-    if (typeof req.body.sale === 'object' && Object.keys(req.body.sale).length > 0) for (const unit in req.body.sale) {
+    if (req.body.hasOwnProperty('sale') && typeof req.body.sale === 'object' && Object.keys(req.body.sale).length > 0) for (const unit in req.body.sale) {
       // If the unit within the sale is an allowed category, and it's value is a number, add it to the units object for the new sale
       if (allowedunits.includes(unit) && typeof req.body.sale[unit] === 'number') units[unit] = req.body.sale[unit];
     }
@@ -35,10 +35,14 @@ router.post('/submitsale', async (req, res) => {
       number: req.session.employeenumber,
       name: req.session.employeename
     };
+    // Identify the timezone
+    let timezone = 'America/Denver';
+    if (req.body.hasOwnProperty('timezone')) timezone = req.body.timezone;
     // Build the new sale object and create a document within the database collection
     const sale = {
       // Hard assumption of mountain time
-      date: utcToZonedTime(new Date().toISOString(), 'America/Denver'),
+      date: utcToZonedTime(new Date().toISOString(), timezone),
+      timezone: timezone,
       employee: employee,
       units: units
     }
