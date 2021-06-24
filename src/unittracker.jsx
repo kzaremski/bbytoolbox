@@ -19,6 +19,7 @@ export default class SaleUnitTracker extends React.Component {
     this.state = {
       saving: false,
       updating: false,
+      reportopen: false,
       error: null,
       success: null,
       employeenumber: '',
@@ -47,17 +48,20 @@ export default class SaleUnitTracker extends React.Component {
     // Bind this to component methods
     this.updateCurrentSales = this.updateCurrentSales.bind(this);
     // New Sale Functionality
-    this.openNewSale    = this.openNewSale.bind(this);
-    this.closeNewSale   = this.closeNewSale.bind(this);
-    this.incrementUnit  = this.incrementUnit.bind(this);
-    this.decrementUnit  = this.decrementUnit.bind(this);
-    this.submitSale     = this.submitSale.bind(this);
+    this.openNewSale = this.openNewSale.bind(this);
+    this.closeNewSale = this.closeNewSale.bind(this);
+    this.incrementUnit = this.incrementUnit.bind(this);
+    this.decrementUnit = this.decrementUnit.bind(this);
+    this.submitSale = this.submitSale.bind(this);
     // Goal Modification
-    this.openEditGoals  = this.openEditGoals.bind(this);
+    this.openEditGoals = this.openEditGoals.bind(this);
     this.closeEditGoals = this.closeEditGoals.bind(this);
-    this.incrementGoal  = this.incrementGoal.bind(this);
-    this.decrementGoal  = this.decrementGoal.bind(this);
-    this.submitGoals    = this.submitGoals.bind(this);
+    this.incrementGoal = this.incrementGoal.bind(this);
+    this.decrementGoal = this.decrementGoal.bind(this);
+    this.submitGoals = this.submitGoals.bind(this);
+    // End of Day Report
+    this.openReport = this.openReport.bind(this);
+    this.closeReport = this.closeReport.bind(this);
   }
 
   // Update current sales
@@ -71,6 +75,7 @@ export default class SaleUnitTracker extends React.Component {
           mode: 'same-origin',
           cache: 'no-cache',
           credentials: 'same-origin',
+          body: JSON.stringify({ timezone: Intl.DateTimeFormat().resolvedOptions().timeZone }),
           headers: {
             'Content-Type': 'application/json'
           }
@@ -128,7 +133,7 @@ export default class SaleUnitTracker extends React.Component {
           body: JSON.stringify({
             sale: this.state.newsale,
             timezone: Intl.DateTimeFormat().resolvedOptions().timeZone
-           }),
+          }),
           headers: {
             'Content-Type': 'application/json'
           }
@@ -139,7 +144,7 @@ export default class SaleUnitTracker extends React.Component {
         if (response) console.log(response);
         data = { error: 'There was an error parsing the response from the backend. Possible errors: 404, 500.' };
       }
-      
+
       this.setState({ ...data, saving: false, newsale: null });
       this.updateCurrentSales();
     });
@@ -177,7 +182,7 @@ export default class SaleUnitTracker extends React.Component {
           credentials: 'same-origin',
           body: JSON.stringify({
             goals: this.state.prevgoals,
-           }),
+          }),
           headers: {
             'Content-Type': 'application/json'
           }
@@ -188,11 +193,15 @@ export default class SaleUnitTracker extends React.Component {
         if (response) console.log(response);
         data = { error: 'There was an error parsing the response from the backend. Possible errors: 404, 500.' };
       }
-      
+
       this.setState({ ...data, saving: false, prevgoals: null });
       this.updateCurrentSales();
     });
   }
+
+  // Open and close the report window
+  closeReport() { this.setState({ reportopen: false }) }
+  openReport() { this.setState({ reportopen: true }) }
 
   render() {
     // Add all units from individual sales into unified counts
@@ -230,12 +239,12 @@ export default class SaleUnitTracker extends React.Component {
     return (
       <>
         <h5><strong>COMPUTING SALE UNIT TRACKER</strong></h5>
-        { this.state.updating ? <Alert variant="warning">Please wait while sales and goals are loaded</Alert> : null }
-        { this.state.error ? <Alert variant="danger" onClose={() => { this.setState({ error: null }) }} dismissible>{this.state.error}</Alert> : null }
-        { this.state.success ? <Alert variant="success" onClose={() => { this.setState({ success: null }) }} dismissible>{this.state.success}</Alert> : null }
+        {this.state.updating ? <Alert variant="warning">Please wait while sales and goals are loaded</Alert> : null}
+        {this.state.error ? <Alert variant="danger" onClose={() => { this.setState({ error: null }) }} dismissible>{this.state.error}</Alert> : null}
+        {this.state.success ? <Alert variant="success" onClose={() => { this.setState({ success: null }) }} dismissible>{this.state.success}</Alert> : null}
         <div>
           <button className="btn btn-info mr-2 mb-2" onClick={this.openEditGoals}>Set Goals</button>
-          <button disabled className="btn btn-warning mr-2 mb-2">EOD Report</button>
+          <button className="btn btn-warning mr-2 mb-2" onClick={this.openReport}>EOD Report</button>
           <button className="btn btn-success mb-2" onClick={this.openNewSale}>New Sale</button>
         </div>
         <div className="mt-1 mb-3">
@@ -252,7 +261,7 @@ export default class SaleUnitTracker extends React.Component {
               <h5><small>MICROSOFT 365/OFFICE ATTACH RATIO:</small></h5>
             </div>
             <div>
-              <h5><strong>{ (officeattach * 100).toFixed(2) }%</strong></h5>
+              <h5><strong>{(officeattach * 100).toFixed(2)}%</strong></h5>
             </div>
           </div>
         </div>
@@ -309,7 +318,7 @@ export default class SaleUnitTracker extends React.Component {
               </tr>
             </thead>
             <tbody>
-              { Object.keys(salesbyemployee).length === 0 ? <tr>
+              {Object.keys(salesbyemployee).length === 0 ? <tr>
                 <td>No sales have been recorded yet.</td>
                 <td></td>
                 <td></td>
@@ -319,19 +328,19 @@ export default class SaleUnitTracker extends React.Component {
               </tr> : Object.keys(salesbyemployee).map((employeenumber) => (
                 <tr key={employeenumber}>
                   <td>
-                    { salesbyemployee[employeenumber].name.split(' ').length > 1 ?
+                    {salesbyemployee[employeenumber].name.split(' ').length > 1 ?
                       salesbyemployee[employeenumber].name.split(' ')[0] + ' '
-                    + salesbyemployee[employeenumber].name.split(' ')[1].substring(0, 1) + '.' :
+                      + salesbyemployee[employeenumber].name.split(' ')[1].substring(0, 1) + '.' :
                       salesbyemployee[employeenumber].name
                     }
                   </td>
-                  <td>{ salesbyemployee[employeenumber].oem }</td>
-                  <td>{ salesbyemployee[employeenumber].office }</td>
-                  <td>{ salesbyemployee[employeenumber].surface }</td>
-                  <td>{ salesbyemployee[employeenumber].tts }</td>
-                  <td>{ salesbyemployee[employeenumber].bp }</td>
+                  <td>{salesbyemployee[employeenumber].oem}</td>
+                  <td>{salesbyemployee[employeenumber].office}</td>
+                  <td>{salesbyemployee[employeenumber].surface}</td>
+                  <td>{salesbyemployee[employeenumber].tts}</td>
+                  <td>{salesbyemployee[employeenumber].bp}</td>
                 </tr>
-              )) }
+              ))}
             </tbody>
           </table>
         </div>
@@ -399,11 +408,11 @@ export default class SaleUnitTracker extends React.Component {
           </Modal.Body>
           <Modal.Footer>
             <Button variant="secondary" onClick={this.closeNewSale}>Cancel</Button>
-            <Button variant="primary" onClick={this.submitSale} disabled={ totalnewsales == 0 }>Submit</Button>
+            <Button variant="primary" onClick={this.submitSale} disabled={totalnewsales == 0}>Submit</Button>
           </Modal.Footer>
         </Modal>
 
-        <Modal show={this.state.prevgoals !== null && !this.state.saving} onHide={this.closeNewSale}>
+        <Modal show={this.state.prevgoals !== null && !this.state.saving} onHide={this.closeEditGoals}>
           <Modal.Header closeButton>
             <Modal.Title>Set Goals</Modal.Title>
           </Modal.Header>
@@ -456,7 +465,73 @@ export default class SaleUnitTracker extends React.Component {
           </Modal.Body>
           <Modal.Footer>
             <Button variant="secondary" onClick={this.closeEditGoals}>Cancel</Button>
-            <Button variant="primary" onClick={this.submitGoals} disabled={ this.state.prevgoals === this.state.goals }>Save Goals</Button>
+            <Button variant="primary" onClick={this.submitGoals} disabled={this.state.prevgoals === this.state.goals}>Save Goals</Button>
+          </Modal.Footer>
+        </Modal>
+
+        <Modal show={this.state.reportopen && !this.state.saving} onHide={this.closeReport} size="lg">
+          <Modal.Header closeButton>
+            <Modal.Title>End Of Day Report</Modal.Title>
+          </Modal.Header>
+          <Modal.Body>
+            <h5>Location 0164 Computing Department End Of Day Sale Unit Totals</h5>
+            <h6>Report for { new Date().toISOString().split('T')[0] }</h6>
+            <table>
+              <thead>
+                <tr>
+                  <th className="border p-2">Employee</th>
+                  <th className="border p-2">OEM</th>
+                  <th className="border p-2">Office</th>
+                  <th className="border p-2">Surface</th>
+                  <th className="border p-2">TTS</th>
+                  <th className="border p-2">BP</th>
+                </tr>
+              </thead>
+              <tbody>
+                {Object.keys(salesbyemployee).length === 0 ? <tr>
+                  <td className="border p-2">No sales have been recorded yet.</td>
+                  <td className="border p-2"></td>
+                  <td className="border p-2"></td>
+                  <td className="border p-2"></td>
+                  <td className="border p-2"></td>
+                  <td className="border p-2"></td>
+                </tr> : Object.keys(salesbyemployee).map((employeenumber) => (
+                  <tr key={employeenumber}>
+                    <td className="border p-2">
+                      {salesbyemployee[employeenumber].name.split(' ').length > 1 ?
+                        salesbyemployee[employeenumber].name.split(' ')[0] + ' '
+                        + salesbyemployee[employeenumber].name.split(' ')[1].substring(0, 1) + '.' :
+                        salesbyemployee[employeenumber].name
+                      }
+                    </td>
+                    <td className="border p-2">{salesbyemployee[employeenumber].oem}</td>
+                    <td className="border p-2">{salesbyemployee[employeenumber].office}</td>
+                    <td className="border p-2">{salesbyemployee[employeenumber].surface}</td>
+                    <td className="border p-2">{salesbyemployee[employeenumber].tts}</td>
+                    <td className="border p-2">{salesbyemployee[employeenumber].bp}</td>
+                  </tr>
+                ))}
+                <tr>
+                  <th className="border p-2">Department Totals</th>
+                  <td className="border p-2">{salestoday.oem}</td>
+                  <td className="border p-2">{salestoday.office}</td>
+                  <td className="border p-2">{salestoday.surface}</td>
+                  <td className="border p-2">{salestoday.tts}</td>
+                  <td className="border p-2">{salestoday.bp}</td>
+                </tr>
+                <tr>
+                  <th className="border p-2">Department Goals</th>
+                  <td className="border p-2">{this.state.goals.oem || 'N/A'}</td>
+                  <td className="border p-2">{this.state.goals.office || 'N/A'}</td>
+                  <td className="border p-2">{this.state.goals.surface || 'N/A'}</td>
+                  <td className="border p-2">{this.state.goals.tts || 'N/A'}</td>
+                  <td className="border p-2">{this.state.goals.bp || 'N/A'}</td>
+                </tr>
+              </tbody>
+            </table>
+          </Modal.Body>
+          <Modal.Footer>
+            <Button variant="primary" onClick={this.closeReport}>Close Report</Button>
           </Modal.Footer>
         </Modal>
       </>

@@ -117,8 +117,11 @@ router.post('/getsales', async (req, res) => {
   try {
     // Authenticate user
     if (!req.session.employeenumber) throw 'Session expired, you are not authenticated.';
+    // Identify the timezone
+    let timezone = 'America/Denver';
+    if (req.body.hasOwnProperty('timezone')) timezone = req.body.timezone;
     // Identify bounding datetimes
-    const now = new Date();
+    const now = utcToZonedTime(new Date().toISOString(), timezone);
     const begin = startOfDay(now);
     const end = endOfDay(now);
     // Find all matching documents using a MongoDB aggregation pipeline
