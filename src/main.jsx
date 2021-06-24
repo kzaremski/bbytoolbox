@@ -71,6 +71,9 @@ class App extends Component {
         setTimeout(() => { splashscreen.parentNode.removeChild(splashscreen) }, 500);
       }, 1000);
     }));
+
+    // Check the login status periodically to make sure that the user is still logged in
+    this.loginCheckInterval = setInterval(() => { this.checkLoginStatus() }, 10000);
   }
   
   render() {

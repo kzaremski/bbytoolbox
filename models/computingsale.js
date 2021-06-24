@@ -1,5 +1,5 @@
 /*
-  IP Address Mongoose Model/Schema
+  Computing Sale Mongoose Model/Schema
 */
 
 // Mongoose package & schema object
@@ -8,6 +8,7 @@ const Schema = mongoose.Schema;
 
 let ComputingSaleSchema = new Schema({
   date: Date,
+  timezone: String,
   employee: {
     name: String,
     number: String
