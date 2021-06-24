@@ -99,8 +99,29 @@ export default class SaleUnitTracker extends React.Component {
     // Get a list of the current sales
     this.updateCurrentSales();
 
-    // Update every five seconds
-    this.updateinterval = setInterval(() => { this.updateCurrentSales() }, 5000);
+    // Silently update every ten seconds
+    this.updateinterval = setInterval(async () => { 
+      try {
+        // Load data
+        let response = await fetch('/saletracker/getsales', {
+          method: 'POST',
+          mode: 'same-origin',
+          cache: 'no-cache',
+          credentials: 'same-origin',
+          body: JSON.stringify({ timezone: Intl.DateTimeFormat().resolvedOptions().timeZone }),
+          headers: {
+            'Content-Type': 'application/json'
+          }
+        }).then(response => response.json());
+        data = response;
+        if (!data.goals) data.goals = this.state.goals;
+      } catch (err) {
+        console.log(err);
+        if (response) console.log(response);
+        data = { error: 'There was an error while automatically updating statistics. Possible errors: 404, 500.' };
+      }
+      this.setState({ ...data });
+     }, 10000);
   }
 
   compenentWillUnmount() {
