@@ -98,6 +98,13 @@ export default class SaleUnitTracker extends React.Component {
     });
     // Get a list of the current sales
     this.updateCurrentSales();
+
+    // Update every five seconds
+    this.updateinterval = setInterval(() => { this.updateCurrentSales() }, 5000);
+  }
+
+  compenentWillUnmount() {
+    clearInterval(this.updateinterval);
   }
 
   // Close the new sale modal, open the new sale modal
