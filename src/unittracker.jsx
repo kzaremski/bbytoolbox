@@ -248,14 +248,14 @@ export default class SaleUnitTracker extends React.Component {
           <button className="btn btn-success mb-2" onClick={this.openNewSale}>New Sale</button>
         </div>
         <div className="mt-1 mb-3">
-          <div className="d-flex flex-direction-row">
+          {/*<div className="d-flex flex-direction-row">
             <div className="mr-3">
               <h5><small>TOP MEMBERSHIP PERFORMER:</small></h5>
             </div>
             <div>
-              <h5><strong>N/A</strong></h5>
+              <h5><strong>{ performer || 'N/A'}</strong></h5>
             </div>
-          </div>
+          </div>*/}
           <div className="d-flex flex-direction-row">
             <div className="mr-3">
               <h5><small>MICROSOFT 365/OFFICE ATTACH RATIO:</small></h5>
@@ -476,59 +476,61 @@ export default class SaleUnitTracker extends React.Component {
           <Modal.Body>
             <h5>Location 0164 Computing Department End Of Day Sale Unit Totals</h5>
             <h6>Report for { new Date().toISOString().split('T')[0] }</h6>
-            <table>
-              <thead>
-                <tr>
-                  <th className="border p-2">Employee</th>
-                  <th className="border p-2">OEM</th>
-                  <th className="border p-2">Office</th>
-                  <th className="border p-2">Surface</th>
-                  <th className="border p-2">TTS</th>
-                  <th className="border p-2">BP</th>
-                </tr>
-              </thead>
-              <tbody>
-                {Object.keys(salesbyemployee).length === 0 ? <tr>
-                  <td className="border p-2">No sales have been recorded yet.</td>
-                  <td className="border p-2"></td>
-                  <td className="border p-2"></td>
-                  <td className="border p-2"></td>
-                  <td className="border p-2"></td>
-                  <td className="border p-2"></td>
-                </tr> : Object.keys(salesbyemployee).map((employeenumber) => (
-                  <tr key={employeenumber}>
-                    <td className="border p-2">
-                      {salesbyemployee[employeenumber].name.split(' ').length > 1 ?
-                        salesbyemployee[employeenumber].name.split(' ')[0] + ' '
-                        + salesbyemployee[employeenumber].name.split(' ')[1].substring(0, 1) + '.' :
-                        salesbyemployee[employeenumber].name
-                      }
-                    </td>
-                    <td className="border p-2">{salesbyemployee[employeenumber].oem}</td>
-                    <td className="border p-2">{salesbyemployee[employeenumber].office}</td>
-                    <td className="border p-2">{salesbyemployee[employeenumber].surface}</td>
-                    <td className="border p-2">{salesbyemployee[employeenumber].tts}</td>
-                    <td className="border p-2">{salesbyemployee[employeenumber].bp}</td>
+            <div className="table-responsive">
+              <table>
+                <thead>
+                  <tr>
+                    <th className="border p-2">Employee</th>
+                    <th className="border p-2">OEM</th>
+                    <th className="border p-2">Office</th>
+                    <th className="border p-2">Surface</th>
+                    <th className="border p-2">TTS</th>
+                    <th className="border p-2">BP</th>
                   </tr>
-                ))}
-                <tr>
-                  <th className="border p-2">Department Totals</th>
-                  <td className="border p-2">{salestoday.oem}</td>
-                  <td className="border p-2">{salestoday.office}</td>
-                  <td className="border p-2">{salestoday.surface}</td>
-                  <td className="border p-2">{salestoday.tts}</td>
-                  <td className="border p-2">{salestoday.bp}</td>
-                </tr>
-                <tr>
-                  <th className="border p-2">Department Goals</th>
-                  <td className="border p-2">{this.state.goals.oem || 'N/A'}</td>
-                  <td className="border p-2">{this.state.goals.office || 'N/A'}</td>
-                  <td className="border p-2">{this.state.goals.surface || 'N/A'}</td>
-                  <td className="border p-2">{this.state.goals.tts || 'N/A'}</td>
-                  <td className="border p-2">{this.state.goals.bp || 'N/A'}</td>
-                </tr>
-              </tbody>
-            </table>
+                </thead>
+                <tbody>
+                  {Object.keys(salesbyemployee).length === 0 ? <tr>
+                    <td className="border p-2">No sales have been recorded yet.</td>
+                    <td className="border p-2"></td>
+                    <td className="border p-2"></td>
+                    <td className="border p-2"></td>
+                    <td className="border p-2"></td>
+                    <td className="border p-2"></td>
+                  </tr> : Object.keys(salesbyemployee).map((employeenumber) => (
+                    <tr key={employeenumber}>
+                      <td className="border p-2">
+                        {salesbyemployee[employeenumber].name.split(' ').length > 1 ?
+                          salesbyemployee[employeenumber].name.split(' ')[0] + ' '
+                          + salesbyemployee[employeenumber].name.split(' ')[1].substring(0, 1) + '.' :
+                          salesbyemployee[employeenumber].name
+                        }
+                      </td>
+                      <td className="border p-2">{salesbyemployee[employeenumber].oem}</td>
+                      <td className="border p-2">{salesbyemployee[employeenumber].office}</td>
+                      <td className="border p-2">{salesbyemployee[employeenumber].surface}</td>
+                      <td className="border p-2">{salesbyemployee[employeenumber].tts}</td>
+                      <td className="border p-2">{salesbyemployee[employeenumber].bp}</td>
+                    </tr>
+                  ))}
+                  <tr>
+                    <th className="border p-2">Department Totals</th>
+                    <td className="border p-2">{salestoday.oem}</td>
+                    <td className="border p-2">{salestoday.office}</td>
+                    <td className="border p-2">{salestoday.surface}</td>
+                    <td className="border p-2">{salestoday.tts}</td>
+                    <td className="border p-2">{salestoday.bp}</td>
+                  </tr>
+                  <tr>
+                    <th className="border p-2">Department Goals</th>
+                    <td className="border p-2">{this.state.goals.oem || 'N/A'}</td>
+                    <td className="border p-2">{this.state.goals.office || 'N/A'}</td>
+                    <td className="border p-2">{this.state.goals.surface || 'N/A'}</td>
+                    <td className="border p-2">{this.state.goals.tts || 'N/A'}</td>
+                    <td className="border p-2">{this.state.goals.bp || 'N/A'}</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
           </Modal.Body>
           <Modal.Footer>
             <Button variant="primary" onClick={this.closeReport}>Close Report</Button>
