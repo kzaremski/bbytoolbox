@@ -9,6 +9,10 @@ const Schema = mongoose.Schema;
 let EmployeeSchema = new Schema({
   number: String,
   name: String,
+  pin: String,
+  departments: Array,
+  departmentadmin: Boolean,
+  admin: Boolean,
   disabled: Boolean
 });
 

@@ -63,12 +63,14 @@ if (app.get('env') === 'production') {
   app.set('trust proxy', 1);
   app.use(session({
     secret: 'A' + Math.random(),
+    expires: new Date(Date.now() + (12 * 60 * 60 * 1000)),
     resave: false,
     saveUninitialized: true,
   }));
 } else {
   app.use(session({
     secret: 'A' + Math.random(),
+    expires: new Date(Date.now() + (12 * 60 * 60 * 1000)),
     resave: false,
     saveUninitialized: true
   }));
@@ -109,12 +111,14 @@ app.post('/currentuser', (req, res) => {
 });
 
 // Login database operations
-async function login(employeenumber) {
+async function login(employeenumber, pinnumber) {
   try {
     if (employeenumber === null || typeof employeenumber != 'string' || employeenumber.length < 1) throw 'Employee number is not valid';
+    if (pinnumber === null || typeof pinnumber != 'string' || pinnumber.length < 4) throw 'PIN is incorrect';
     let employee = await Employee.findOne({ number: employeenumber.trim() });
     if (!employee) throw 'Employee number is not valid';
     if (employee.disabled) throw 'Access has been disabled for this employee number';
+    if (employee.pin != pinnumber) throw 'PIN is incorrect';
     return {
       success: true,
       name: employee.name,
@@ -128,7 +132,8 @@ async function login(employeenumber) {
 // Login API endpoint
 app.post('/login', (req, res) => {
   if (!req.body.employeenumber) return res.send({ error: 'Employee number is not valid' });
-  login(req.body.employeenumber).then((response) => {
+  if (!req.body.pinnumber) return res.send({ error: 'PIN is incorrect' });
+  login(req.body.employeenumber, req.body.pinnumber).then((response) => {
     if (response.success) {
       // Record the login
       Login.create({

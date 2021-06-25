@@ -48,9 +48,10 @@ $enable-rounded: false;
 $body-color:    $gray-800;
 
 // Fonts
+@import url('https://fonts.googleapis.com/css2?family=Open+Sans:ital,wght@0,400;0,700;1,400;1,700&display=swap');
 
 // stylelint-disable-next-line value-keyword-case
-$font-family-sans-serif:    "Segoe UI" sans-serif;
+$font-family-sans-serif:    "Open Sans", sans-serif;
 $headings-font-weight:      400;
 
 // Navbar
@@ -211,4 +212,17 @@ $progress-height:               .5rem;
   animation-name: fadeScaleOut;
   animation-duration: 0.5s;
   opacity: 0;
+}
+
+/* HIDE NUMBER INPUT ARROWS */
+/* Chrome, Safari, Edge, Opera */
+input::-webkit-outer-spin-button,
+input::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+/* Firefox */
+input[type=number] {
+  -moz-appearance: textfield;
 }
