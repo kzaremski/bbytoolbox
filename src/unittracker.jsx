@@ -101,6 +101,7 @@ export default class SaleUnitTracker extends React.Component {
 
     // Silently update every ten seconds
     this.updateinterval = setInterval(async () => { 
+      let data = {};
       try {
         // Load data
         let response = await fetch('/saletracker/getsales', {
@@ -117,7 +118,6 @@ export default class SaleUnitTracker extends React.Component {
         if (!data.goals) data.goals = this.state.goals;
       } catch (err) {
         console.log(err);
-        if (response) console.log(response);
         data = { error: 'There was an error while automatically updating statistics. Possible errors: 404, 500.' };
       }
       this.setState({ ...data });
