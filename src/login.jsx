@@ -123,12 +123,12 @@ export default class Login extends React.Component {
                 { this.state.error ? <div className="alert alert-danger"><strong>Error: </strong>{this.state.error}</div> : null}
                 <p className="card-text">Changes made are tracked and associated by employee number. Please enter your Best Buy&reg; employee number and PIN number to continue.</p>
                 <div className="form-group mb-0">
-                  <input type="number" className="form-control mb-2" id="employeenumberinput" placeholder="Your employee number" step="1" onKeyDown={this.handleKeyDown} value={this.state.employeenumber} onChange={this.handleChange} name="employeenumber"/>
+                  <input type="number" autoComplete="off" className="form-control mb-2" id="employeenumberinput" placeholder="Your employee number" step="1" onKeyDown={this.handleKeyDown} value={this.state.employeenumber} onChange={this.handleChange} name="employeenumber"/>
                   <div className="row">
-                    <div className="col-3"><input type="number" className="form-control d-block text-center" id="pin1" placeholder="&#8226;" step="1" onChange={this.handleChange} onKeyDown={this.handleKeyDown} value={this.state.pin1} name="pin1"/></div>
-                    <div className="col-3"><input type="number" className="form-control d-block text-center" id="pin2" placeholder="&#8226;" step="1" onChange={this.handleChange} onKeyDown={this.handleKeyDown} value={this.state.pin2} name="pin2"/></div>
-                    <div className="col-3"><input type="number" className="form-control d-block text-center" id="pin3" placeholder="&#8226;" step="1" onChange={this.handleChange} onKeyDown={this.handleKeyDown} value={this.state.pin3} name="pin3"/></div>
-                    <div className="col-3"><input type="number" className="form-control d-block text-center" id="pin4" placeholder="&#8226;" step="1" onChange={this.handleChange} onKeyDown={this.handleKeyDown} value={this.state.pin4} name="pin4"/></div>
+                    <div className="col-3"><input autoComplete="off" type="number" className="form-control d-block text-center" id="pin1" placeholder="&#8226;" step="1" onChange={this.handleChange} onKeyDown={this.handleKeyDown} value={this.state.pin1} name="pin1"/></div>
+                    <div className="col-3"><input autoComplete="off" type="number" className="form-control d-block text-center" id="pin2" placeholder="&#8226;" step="1" onChange={this.handleChange} onKeyDown={this.handleKeyDown} value={this.state.pin2} name="pin2"/></div>
+                    <div className="col-3"><input autoComplete="off" type="number" className="form-control d-block text-center" id="pin3" placeholder="&#8226;" step="1" onChange={this.handleChange} onKeyDown={this.handleKeyDown} value={this.state.pin3} name="pin3"/></div>
+                    <div className="col-3"><input autoComplete="off" type="number" className="form-control d-block text-center" id="pin4" placeholder="&#8226;" step="1" onChange={this.handleChange} onKeyDown={this.handleKeyDown} value={this.state.pin4} name="pin4"/></div>
                   </div>
                   <div className="d-flex flex-direction-row mt-2" >
                     <button type="button" className="ml-auto btn btn-primary" onClick={this.login} disabled={this.state.employeenumber.length < 1 || this.state.submitting}>Log in</button>

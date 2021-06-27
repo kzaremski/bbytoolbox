@@ -18,6 +18,10 @@ import Login from './login.jsx';
 // Routes
 import Home from './home.jsx';
 import SaleUnitTracker from './unittracker.jsx';
+import UserSettings from './usersettings.jsx';
+// Admin
+import Admin from './admin/admin.jsx';
+import AdminUserManage from './admin/usermanage.jsx';
 
 // The main App component
 class App extends Component {
@@ -51,14 +55,17 @@ class App extends Component {
       // Set the global variables
       window.employeenumber = account.employeenumber;
       window.employeename = account.employeename;
+      window.isadmin = account.admin;
     } catch(err) {
       // Set the global variables
       window.employeenumber = null;
       window.employeename = null;
+      window.isadmin = false;
     }
     this.setState({
       employeenumber: window.employeenumber,
-      employeename: window.employeename
+      employeename: window.employeename,
+      isadmin: window.isadmin
     });
   }
 
@@ -85,6 +92,9 @@ class App extends Component {
             <Switch>
               <Route path="/" exact component={Home}/>
               <Route path="/saletracker" exact component={SaleUnitTracker}/>
+              <Route path="/admin" exact component={Admin}/>
+              <Route path="/admin/usermanage" exact component={AdminUserManage}/>
+              <Route path="/user" exact component={UserSettings}/>
             </Switch>
           </> }
         </div>

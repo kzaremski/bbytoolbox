@@ -16,6 +16,7 @@ export default class Home extends React.Component {
     this.state = {
       employeenumber: '',
       employeename: '',
+      isadmin: false
     }
   }
 
@@ -35,7 +36,8 @@ export default class Home extends React.Component {
   componentDidMount() {
     this.setState({
       employeenumber: window.employeenumber,
-      employeename: window.employeename
+      employeename: window.employeename,
+      isadmin: window.isadmin
     });
   }
 
@@ -61,34 +63,46 @@ export default class Home extends React.Component {
             </div>
           </div>
         </Link>
-        <div className="row">
-          <div className="col-6">
-            <Link to="/system">
-              <div className="d-flex flex-column flex-md-row  border p-3">
-                <div className="d-flex mb-2 mb-md-0">
-                  <img src="/static/img/cogs.svg" style={{ "width": "100px" }} className="mx-auto"/>
+        {this.state.isadmin ? <>
+          <div className="row">
+            <div className="col-6">
+              <Link to="/admin">
+                <div className="d-flex flex-column flex-md-row  border p-3">
+                  <div className="d-flex mb-2 mb-md-0">
+                    <img src="/static/img/cogs.svg" style={{ "width": "100px" }} className="mx-auto" />
+                  </div>
+                  <div className="pl-md-3 text-dark text-center text-md-left">
+                    <h5>System Admin</h5>
+                    <p className="m-0 d-none d-md-block">Manage 164 Toolbox application server settings. <span className="text-warning">Requires admin privileges.</span></p>
+                  </div>
                 </div>
-                <div className="pl-md-3 text-dark text-center text-md-left">
-                  <h5>System Admin</h5>
-                  <p className="m-0 d-none d-md-block">Manage 164 Toolbox application server settings.</p>
+              </Link>
+            </div>
+            <div className="col-6">
+              <Link to="/user">
+                <div className="d-flex flex-column flex-md-row border p-3">
+                  <div className="d-flex mb-2 mb-md-0">
+                    <img src="/static/img/user.svg" style={{ "width": "100px" }} className="mx-auto" />
+                  </div>
+                  <div className="pl-md-3 text-dark text-center text-md-left">
+                    <h5>User Settings</h5>
+                    <p className="m-0 d-none d-md-block">Change your PIN number and other settings.</p>
+                  </div>
                 </div>
-              </div>
-            </Link>
+              </Link>
+            </div>
           </div>
-          <div className="col-6">
-            <Link to="/user">
-              <div className="d-flex flex-column flex-md-row border p-3">
-                <div className="d-flex mb-2 mb-md-0">
-                  <img src="/static/img/user.svg" style={{ "width": "100px" }} className="mx-auto"/>
-                </div>
-                <div className="pl-md-3 text-dark text-center text-md-left">
-                  <h5>User Settings</h5>
-                  <p className="m-0 d-none d-md-block">Change your PIN number and other settings.</p>
-                </div>
-              </div>
-            </Link>
+        </> : <Link to="/user">
+          <div className="d-flex border p-3 mb-3">
+            <div>
+              <img src="/static/img/user.svg" style={{ "width": "100px" }} />
+            </div>
+            <div className="pl-3 text-dark">
+              <h5>User Settings</h5>
+              <p className="m-0">Change your PIN number and other settings.</p>
+            </div>
           </div>
-        </div>
+        </Link> }
       </>
     );
   }
