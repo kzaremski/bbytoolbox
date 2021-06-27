@@ -41,8 +41,8 @@ export default class Home extends React.Component {
 
   render() {
     const FirstNameL = this.state.employeename.split(' ').length > 1 ?
-                       this.state.employeename.split(' ')[0] + ' ' + this.state.employeename.split(' ')[1].substring(0, 1) :
-                       this.state.employeename;
+      this.state.employeename.split(' ')[0] + ' ' + this.state.employeename.split(' ')[1].substring(0, 1) :
+      this.state.employeename;
 
     return (
       <>
@@ -51,9 +51,9 @@ export default class Home extends React.Component {
           <div className="ml-auto"><button className="btn btn-danger" onClick={this.logout}>Logout</button></div>
         </div>
         <Link to="/saletracker">
-          <div className="d-flex border p-3">
+          <div className="d-flex border p-3 mb-3">
             <div>
-              <img src="/static/img/spreadsheet.png" style={{"width": "100px"}}/>
+              <img src="/static/img/bar-chart.svg" style={{ "width": "100px" }} />
             </div>
             <div className="pl-3 text-dark">
               <h5>Computing Sale Unit Tracker</h5>
@@ -61,6 +61,34 @@ export default class Home extends React.Component {
             </div>
           </div>
         </Link>
+        <div className="row">
+          <div className="col-6">
+            <Link to="/system">
+              <div className="d-flex flex-column flex-md-row  border p-3">
+                <div className="d-flex mb-2 mb-md-0">
+                  <img src="/static/img/cogs.svg" style={{ "width": "100px" }} className="mx-auto"/>
+                </div>
+                <div className="pl-md-3 text-dark text-center text-md-left">
+                  <h5>System Admin</h5>
+                  <p className="m-0 d-none d-md-block">Manage 164 Toolbox application server settings.</p>
+                </div>
+              </div>
+            </Link>
+          </div>
+          <div className="col-6">
+            <Link to="/user">
+              <div className="d-flex flex-column flex-md-row border p-3">
+                <div className="d-flex mb-2 mb-md-0">
+                  <img src="/static/img/user.svg" style={{ "width": "100px" }} className="mx-auto"/>
+                </div>
+                <div className="pl-md-3 text-dark text-center text-md-left">
+                  <h5>User Settings</h5>
+                  <p className="m-0 d-none d-md-block">Change your PIN number and other settings.</p>
+                </div>
+              </div>
+            </Link>
+          </div>
+        </div>
       </>
     );
   }
