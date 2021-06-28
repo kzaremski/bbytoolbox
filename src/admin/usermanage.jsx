@@ -8,6 +8,7 @@
 // Import dependencies
 import React from 'react';
 import { Link } from 'react-router-dom';
+import Alert from 'react-bootstrap/Alert';
 
 export default class AdminUserManage extends React.Component {
   constructor(props) {
@@ -20,6 +21,9 @@ export default class AdminUserManage extends React.Component {
 
       users: []
     }
+
+    // Bind this to component methods
+    this.getAllUsers = this.getAllUsers.bind(this);
   }
 
   async getAllUsers() {
@@ -31,16 +35,15 @@ export default class AdminUserManage extends React.Component {
         mode: 'same-origin',
         cache: 'no-cache',
         credentials: 'same-origin',
-        body: JSON.stringify({ timezone: Intl.DateTimeFormat().resolvedOptions().timeZone }),
         headers: {
           'Content-Type': 'application/json'
         }
       }).then(response => response.json());
       data = response;
-      if (!data.goals) data.goals = this.state.goals;
+      console.log(data)
     } catch (err) {
       console.log(err);
-      data = { error: 'There was an error while automatically updating statistics. Possible errors: 404, 500.' };
+      data = { error: 'There was an error while loading the list of employees.' };
     }
     this.setState({ ...data });
   }
@@ -51,6 +54,7 @@ export default class AdminUserManage extends React.Component {
       employeename: window.employeename,
       isadmin: window.isadmin
     });
+    this.getAllUsers();
   }
 
   render() {
@@ -58,7 +62,14 @@ export default class AdminUserManage extends React.Component {
       <>
         {this.state.isadmin ?
           <>
-
+            <h6><strong>EMPLOYEE USER ACCOUNTS:</strong></h6>
+            { this.state.users.length == 0 ? <p>No employee user accounts found.</p> : 
+              this.state.users.map((user) => (
+                <div>
+                  <h5>{ user.name }</h5>
+                </div>
+              ))
+            }            
           </>
           : <>
             <div className="alert alert-danger"><strong>Access Denied</strong><br />Your account is not authorized to access this area.<br className="mb-3" /><Link to="/" className="text-danger">Go back to the main menu.</Link></div>

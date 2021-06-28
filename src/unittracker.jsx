@@ -502,8 +502,8 @@ export default class SaleUnitTracker extends React.Component {
             <Modal.Title>End Of Day Report</Modal.Title>
           </Modal.Header>
           <Modal.Body>
-            <h5>Location 0164 Computing Department End Of Day Sale Unit Totals</h5>
-            <h6>Report for { new Date().toISOString().split('T')[0] }</h6>
+            <span>Location 0164 Computing Department End Of Day Sale Unit Totals</span><br/>
+            <span>Report for { new Date().toISOString().split('T')[0] }</span>
             <div className="table-responsive">
               <table>
                 <thead>
