@@ -101,6 +101,7 @@ export default class SaleUnitTracker extends React.Component {
 
     // Silently update every ten seconds
     this.updateinterval = setInterval(async () => { 
+      let data = {};
       try {
         // Load data
         let response = await fetch('/saletracker/getsales', {
@@ -117,7 +118,6 @@ export default class SaleUnitTracker extends React.Component {
         if (!data.goals) data.goals = this.state.goals;
       } catch (err) {
         console.log(err);
-        if (response) console.log(response);
         data = { error: 'There was an error while automatically updating statistics. Possible errors: 404, 500.' };
       }
       this.setState({ ...data });
@@ -502,8 +502,8 @@ export default class SaleUnitTracker extends React.Component {
             <Modal.Title>End Of Day Report</Modal.Title>
           </Modal.Header>
           <Modal.Body>
-            <h5>Location 0164 Computing Department End Of Day Sale Unit Totals</h5>
-            <h6>Report for { new Date().toISOString().split('T')[0] }</h6>
+            <span>Location 0164 Computing Department End Of Day Sale Unit Totals</span><br/>
+            <span>Report for { new Date().toISOString().split('T')[0] }</span>
             <div className="table-responsive">
               <table>
                 <thead>

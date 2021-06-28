@@ -101,12 +101,15 @@ app.get('*', (req, res) => { res.sendFile(path.join(__dirname, '/index.html')) }
 
 // Applications
 app.use('/saletracker', require('./saletracker.js'));
+app.use('/user', require('./user.js'));
+app.use('/admin', require('./admin.js'));
 
 // Get current account status
-app.post('/currentuser', (req, res) => {
+app.post('/currentuser', async (req, res) => {
   res.send({
     employeenumber: req.session.employeenumber,
     employeename: req.session.employeename,
+    admin: req.session.admin
   });
 });
 
@@ -122,7 +125,8 @@ async function login(employeenumber, pinnumber) {
     return {
       success: true,
       name: employee.name,
-      number: employee.number
+      number: employee.number,
+      admin: employee.admin
     };
   } catch(err) {
     return { error: String(err) };
@@ -144,6 +148,7 @@ app.post('/login', (req, res) => {
       // Set the server side session
       req.session.employeename = response.name;
       req.session.employeenumber = response.number;
+      req.session.admin = response.admin;
     }
     res.send(response);
   });
