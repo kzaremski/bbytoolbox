@@ -27,5 +27,24 @@ router.post('/getusers', async (req, res) => {
   }
 });
 
+// Set the PIN number for a particular user
+router.post('/setpin', async (req, res) => {
+  try {
+    // Authenticate
+    if (!req.session.employeenumber) throw 'No login session has been detected';
+    if (!req.session.admin) throw 'You do not have admin access';
+    // Validate
+    if (!req.body.employeenumber) throw 'The employee number is undefined';
+    if (!req.body.pin) throw 'The new PIN number is undefined';
+    if (typeof req.body.pin != 'string' || req.body.pin.length != 4) throw 'The new PIN number is invalid';
+    // Update database
+    const employee = await Employee.findOne({ number: employeenumber });
+    if (!employee) throw 'The employee number is invalid'
+    await Employee.findOneAndUpdate({ number: employeenumber }, { pin: req.body.pin });
+  } catch (err) {
+    return res.send({ error: String(err) });
+  }
+});
+
 // Exporting the router to be used elsewhere
 module.exports = router;

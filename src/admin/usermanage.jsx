@@ -19,10 +19,12 @@ export default class AdminUserManage extends React.Component {
       employeename: '',
       isadmin: false,
 
+      selected: null,
       users: []
     }
 
     // Bind this to component methods
+    this.selectUser = this.selectUser.bind(this);
     this.getAllUsers = this.getAllUsers.bind(this);
   }
 
@@ -40,7 +42,6 @@ export default class AdminUserManage extends React.Component {
         }
       }).then(response => response.json());
       data = response;
-      console.log(data)
     } catch (err) {
       console.log(err);
       data = { error: 'There was an error while loading the list of employees.' };
@@ -57,19 +58,48 @@ export default class AdminUserManage extends React.Component {
     this.getAllUsers();
   }
 
+  // Select a user
+  selectUser(event) {
+    const clicked = event.currentTarget.getAttribute('name');
+    this.setState({ selected: clicked });
+  }
+
   render() {
+    // Get the object of the selected user
+    const selectedUser = this.state.users.find(user => {
+      return user.number === this.state.selected;
+    });
+
+    const selected = this.state.selected ? (
+      <div className="bg-light p-3 my-3" key={selectedUser.number}>
+        <h5 className="mb-1">{selectedUser.name}</h5>
+        <div className="row mb-2">
+          <div className="col-md-4">Employee: {selectedUser.number}</div>
+          <div className="col-md-4">Admin: {selectedUser.admin ? 'YES' : 'NO'}</div>
+          <div className="col-md-4">Disabled: {selectedUser.disabled ? 'YES' : 'NO'}</div>
+        </div>
+        <button className="btn btn-primary">Reset PIN</button>
+      </div>
+    ) : null;
+
     return (
       <>
         {this.state.isadmin ?
           <>
             <h6><strong>EMPLOYEE USER ACCOUNTS:</strong></h6>
-            { this.state.users.length == 0 ? <p>No employee user accounts found.</p> : 
+            {this.state.users.length == 0 ? <p>No employee user accounts found.</p> :
               this.state.users.map((user) => (
-                <div>
-                  <h5>{ user.name }</h5>
-                </div>
+                user.number === this.state.selected ? selected :
+                  <div className="mb-2" style={{ "cursor": "pointer" }} onClick={this.selectUser} name={user.number} key={user.number}>
+                    <h5 className="mb-1">{user.name}</h5>
+                    <div className="row">
+                      <div className="col-md-4">Employee: {user.number}</div>
+                      <div className="col-md-4">Admin: {user.admin ? 'YES' : 'NO'}</div>
+                      <div className="col-md-4">Disabled: {user.disabled ? 'YES' : 'NO'}</div>
+                    </div>
+                  </div>
               ))
-            }            
+            }
           </>
           : <>
             <div className="alert alert-danger"><strong>Access Denied</strong><br />Your account is not authorized to access this area.<br className="mb-3" /><Link to="/" className="text-danger">Go back to the main menu.</Link></div>
