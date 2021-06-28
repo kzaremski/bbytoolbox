@@ -11,6 +11,9 @@ const mongoose = require('mongoose');
 
 const router = require('express').Router();
 
+// Mongoose Models
+const Employee = require(path.join(__dirname, 'models/employee'));
+
 router.post('/changepin', async (req, res) => {
   if (!req.session.employeenumber) return res.send({ error: 'Employee number is not valid' });
   if (!req.body.oldpin) return res.send({ error: 'PIN is incorrect' });
