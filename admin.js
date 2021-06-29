@@ -38,9 +38,11 @@ router.post('/setpin', async (req, res) => {
     if (!req.body.pin) throw 'The new PIN number is undefined';
     if (typeof req.body.pin != 'string' || req.body.pin.length != 4) throw 'The new PIN number is invalid';
     // Update database
+    const employeenumber = req.body.employeenumber;
     const employee = await Employee.findOne({ number: employeenumber });
     if (!employee) throw 'The employee number is invalid'
     await Employee.findOneAndUpdate({ number: employeenumber }, { pin: req.body.pin });
+    return res.send({ success: 'The employee\'s PIN number has been reset.' });
   } catch (err) {
     return res.send({ error: String(err) });
   }
