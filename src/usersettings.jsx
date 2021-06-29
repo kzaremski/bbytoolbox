@@ -95,7 +95,6 @@ export default class UserSettings extends React.Component {
       });
       
       if (!data.error) this.setState({ pinchange: false });
-      this.updateCurrentSales();
     });
   }
 
