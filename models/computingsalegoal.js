@@ -9,6 +9,7 @@ const Schema = mongoose.Schema;
 let ComputingSaleGoalSchema = new Schema({
   date: String,
   modified: Array,
+  store: String,
   units: {
     oem: Number,
     office: Number,

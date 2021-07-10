@@ -9,6 +9,7 @@ const Schema = mongoose.Schema;
 let ComputingSaleSchema = new Schema({
   date: Date,
   timezone: String,
+  store: String,
   employee: {
     name: String,
     number: String
