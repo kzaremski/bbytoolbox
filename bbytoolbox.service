@@ -1,14 +1,14 @@
 [Unit]
-Description=Best Buy 164 Toolbox
-Documentation=https://github.com/kzaremski/164-toolbox
+Description=Best Buy Toolbox
+Documentation=https://github.com/kzaremski/bbytoolbox
 After=network.target
 
 [Service]
-WorkingDirectory=/home/node/164-toolbox
+WorkingDirectory=/etc/bbytoolbox/
 Environment=PORT=3000
 Type=simple
 User=node
-ExecStart=/usr/bin/node /home/node/164-toolbox/main.js
+ExecStart=/usr/bin/node /etc/bbytoolbox/main.js
 Restart=on-failure
 
 [Install]
