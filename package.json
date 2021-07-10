@@ -1,7 +1,7 @@
 {
-  "name": "164-toolbox",
+  "name": "bbytoolbox",
   "version": "1.0.0",
-  "description": "A selection of useful tools for retail associates at my Best Buy store, 164 in Lone Tree, CO.",
+  "description": "",
   "main": "main.js",
   "scripts": {
     "build": "webpack --mode production",
@@ -11,14 +11,14 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/kzaremski/164-toolbox.git"
+    "url": "git+https://github.com/kzaremski/bbytoolbox.git"
   },
   "author": "Konstantin Zaremski",
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/kzaremski/164-toolbox/issues"
+    "url": "https://github.com/kzaremski/bbytoolbox/issues"
   },
-  "homepage": "https://github.com/kzaremski/164-toolbox#readme",
+  "homepage": "https://github.com/kzaremski/bbytoolbox#readme",
   "dependencies": {
     "@fluentui/react": "^8.17.4",
     "bcrypt": "^5.0.1",

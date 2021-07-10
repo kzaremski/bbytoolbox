@@ -1,31 +1,12 @@
 /**
- * 164 Tool Box
- * -- Konstantin Zaremski
- * -- June 9, 2021
- * -- Licensed under the MIT license
+ * BBY Toolbox
+ *  Konstantin Zaremski
+ *  July 9, 2021
  * 
- * Copyright 2021 Konstantin Zaremski
- * 
- * Permission is hereby granted, free of charge, to any person obtaining a copy of
- * this software and associated documentation files (the "Software"), to deal in
- * the Software without restriction, including without limitation the rights to
- * use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies
- * of the Software, and to permit persons to whom the Software is furnished to do
- * so, subject to the following conditions:
- * 
- * The above copyright notice and this permission notice shall be included in all
- * copies or substantial portions of the Software.
- * 
- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
- * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
- * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
- * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
- * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
- * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
- * SOFTWARE.
+ * See details in LICENSE.
  */
 
-// Require dependencies
+// Require depende+ncies
 const path = require('path');
 const express = require('express');
 const bcrypt = require('bcrypt');
@@ -109,8 +90,15 @@ app.post('/currentuser', async (req, res) => {
   res.send({
     employeenumber: req.session.employeenumber,
     employeename: req.session.employeename,
-    admin: req.session.admin
+    admin: req.session.admin,
+    store: req.session.store,
+    defaultstore: req.session.defaultstore,
   });
+});
+
+// Get a list of all locations
+app.post('/getstores', async (req, res) => {
+
 });
 
 // Login database operations
@@ -126,6 +114,8 @@ async function login(employeenumber, pinnumber) {
       success: true,
       name: employee.name,
       number: employee.number,
+      store: employee.store,
+      defaultstore: employee.defaultstore,
       admin: employee.admin
     };
   } catch(err) {
@@ -149,6 +139,8 @@ app.post('/login', (req, res) => {
       req.session.employeename = response.name;
       req.session.employeenumber = response.number;
       req.session.admin = response.admin;
+      req.session.store = response.store;
+      req.session.defaultstore = response.store;
     }
     res.send(response);
   });

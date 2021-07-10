@@ -1,5 +1,5 @@
 /*
-  Employee/User Mongoose Model/Schema
+  Store/Location Mongoose Model/Schema
 */
 
 // Mongoose package & schema object
@@ -10,7 +10,6 @@ let StoreSchema = new Schema({
   number: String,
   name: String,
   district: String,
-  
   address: {
     street1: String,
     street2: String,
@@ -20,4 +19,4 @@ let StoreSchema = new Schema({
   }
 });
 
-module.exports = mongoose.model('employees', EmployeeSchema);
+module.exports = mongoose.model('stores', StoreSchema);

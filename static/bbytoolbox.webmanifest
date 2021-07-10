@@ -1,6 +1,6 @@
 {
-  "name": "BBY 164 Toolbox",
-  "short_name": "BBY 164 Toolbox",
+  "name": "BBY Toolbox",
+  "short_name": "BBY Toolbox",
   "start_url": "/",
   "display": "standalone",
   "background_color": "#fff",
