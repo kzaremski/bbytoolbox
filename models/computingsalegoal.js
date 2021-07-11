@@ -7,6 +7,7 @@ const mongoose = require('mongoose');
 const Schema = mongoose.Schema;
 
 let ComputingSaleGoalSchema = new Schema({
+  guid: String,
   date: String,
   modified: Array,
   store: String,

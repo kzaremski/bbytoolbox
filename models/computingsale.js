@@ -7,6 +7,7 @@ const mongoose = require('mongoose');
 const Schema = mongoose.Schema;
 
 let ComputingSaleSchema = new Schema({
+  guid: String,
   date: Date,
   timezone: String,
   store: String,

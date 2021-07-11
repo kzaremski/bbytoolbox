@@ -12,13 +12,16 @@ export default class Navbar extends React.Component {
     return (
       <nav className='navbar navbar-dark bg-primary fixed-top'>
         <div className='container'>
-          <div className='navbar-header'>
-            <Link className='navbar-brand' to='/'>
-              {/*<Route render={({ location }) => ['/'].includes(location.pathname) ? null : <span className="mr-3">&#9664;</span> } />*/}
-              <img alt='Brand' className='mr-3' src='/static/img/toolbox-icon-only.png' style={{ width: "40px" }}/>
-              <span>164 Toolbox</span>
-            </Link>
-          </div>
+          <Link to='/' className="navbar-brand">
+            <img alt='Brand' className='mr-3' src='/static/img/toolbox-icon-only.png' style={{ width: "40px" }} />
+            <span>BBY Toolbox</span>
+          </Link>
+          { window.store != null ?
+          <ul className="navbar-nav ml-auto">
+            <li className="nav-item">
+              <span className="nav-link" role="button" aria-haspopup="true" aria-expanded="false">Location { window.store }</span>
+            </li>
+          </ul> : null }
         </div>
       </nav>
     );

@@ -1,5 +1,5 @@
 /**
- * 164 Toolbox / User Settings
+ * BBY Toolbox / User Settings
  * 
  * Konstantin Zaremski
  * -- June 27, 2021
@@ -18,6 +18,7 @@ export default class UserSettings extends React.Component {
     this.state = {
       employeenumber: '',
       employeename: '',
+      store: '',
       isadmin: false,
 
       // PIN digits
@@ -165,6 +166,10 @@ export default class UserSettings extends React.Component {
               <tr>
                 <th>Employee Number</th>
                 <td>{this.state.employeenumber}</td>
+              </tr>
+              <tr>
+                <th>Location</th>
+                <td>{this.state.store || 'N/A'}</td>
               </tr>
               <tr>
                 <th>Access Level</th>

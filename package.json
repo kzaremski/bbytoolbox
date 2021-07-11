@@ -21,6 +21,9 @@
   "homepage": "https://github.com/kzaremski/bbytoolbox#readme",
   "dependencies": {
     "@fluentui/react": "^8.17.4",
+    "@fortawesome/fontawesome-svg-core": "^1.2.35",
+    "@fortawesome/free-solid-svg-icons": "^5.15.3",
+    "@fortawesome/react-fontawesome": "^0.1.14",
     "bcrypt": "^5.0.1",
     "body-parser": "^1.19.0",
     "chokidar": "^3.5.1",

@@ -11,7 +11,6 @@ let EmployeeSchema = new Schema({
   name: String,
   pin: String,
   store: String,
-  defaultstore: String,
   admin: Boolean,
   disabled: Boolean
 });

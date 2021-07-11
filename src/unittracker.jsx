@@ -1,5 +1,5 @@
 /**
- * 164 Toolbox / Computing Sale Unit Tracker App
+ * BBY Toolbox / Computing Sale Unit Tracker App
  * 
  * Konstantin Zaremski
  * -- June 15, 2021
@@ -7,9 +7,11 @@
 
 // Import dependencies
 import React from 'react';
+import { Link } from 'react-router-dom';
 import Modal from 'react-bootstrap/Modal';
 import Button from 'react-bootstrap/Button';
 import Alert from 'react-bootstrap/Alert';
+import ButtonGroup from 'react-bootstrap/ButtonGroup';
 
 export default class SaleUnitTracker extends React.Component {
   constructor(props) {
@@ -100,7 +102,7 @@ export default class SaleUnitTracker extends React.Component {
     this.updateCurrentSales();
 
     // Silently update every ten seconds
-    this.updateinterval = setInterval(async () => { 
+    this.updateinterval = setInterval(async () => {
       let data = {};
       try {
         // Load data
@@ -121,7 +123,7 @@ export default class SaleUnitTracker extends React.Component {
         data = { error: 'There was an error while automatically updating statistics. Possible errors: 404, 500.' };
       }
       this.setState({ ...data });
-     }, 10000);
+    }, 10000);
   }
 
   compenentWillUnmount() {
@@ -270,15 +272,19 @@ export default class SaleUnitTracker extends React.Component {
 
     return (
       <>
+        <ol className="breadcrumb">
+          <li className="breadcrumb-item"><Link to="/">Toolbox</Link></li>
+          <li className="breadcrumb-item active">Computing Sale Unit Tracker</li>
+        </ol>
         <h5><strong>COMPUTING SALE UNIT TRACKER</strong></h5>
         {this.state.updating ? <Alert variant="warning">Please wait while sales and goals are loaded</Alert> : null}
         {this.state.error ? <Alert variant="danger" onClose={() => { this.setState({ error: null }) }} dismissible>{this.state.error}</Alert> : null}
         {this.state.success ? <Alert variant="success" onClose={() => { this.setState({ success: null }) }} dismissible>{this.state.success}</Alert> : null}
-        <div>
-          <button className="btn btn-info mr-2 mb-2" onClick={this.openEditGoals}>Set Goals</button>
-          <button className="btn btn-warning mr-2 mb-2" onClick={this.openReport}>EOD Report</button>
-          <button className="btn btn-success mb-2" onClick={this.openNewSale}>New Sale</button>
-        </div>
+        <ButtonGroup>
+          <Button variant="info" onClick={this.openEditGoals}>Set Goals</Button>
+          <Button variant="warning" onClick={this.openReport}>EOD Report</Button>
+          <Button variant="success" onClick={this.openNewSale}>New Sale</Button>
+        </ButtonGroup>
         <div className="mt-1 mb-3">
           {/*<div className="d-flex flex-direction-row">
             <div className="mr-3">
@@ -506,8 +512,8 @@ export default class SaleUnitTracker extends React.Component {
             <Modal.Title>End Of Day Report</Modal.Title>
           </Modal.Header>
           <Modal.Body>
-            <span>Location 0164 Computing Department End Of Day Sale Unit Totals</span><br/>
-            <span>Report for { localISOTime.split('T')[0] }</span>
+            <span>Location 0164 Computing Department End Of Day Sale Unit Totals</span><br />
+            <span>Report for {localISOTime.split('T')[0]}</span>
             <div className="table-responsive">
               <table>
                 <thead>

@@ -48,5 +48,35 @@ router.post('/setpin', async (req, res) => {
   }
 });
 
+router.post('/addemployee', async (req, res) => {
+  try {
+    // Authenticate
+    if (!req.session.employeenumber) throw 'No login session has been detected';
+    if (!req.session.admin) throw 'You do not have admin access';
+    // Validate
+
+    // Update database
+
+    // Notify
+  } catch (err) {
+    return res.send({ error: String(err) });
+  }
+});
+
+router.post('/editemployee', async (req, res) => {
+  try {
+    // Authenticate
+    if (!req.session.employeenumber) throw 'No login session has been detected';
+    if (!req.session.admin) throw 'You do not have admin access';
+    // Validate
+
+    // Update database
+
+    // Notify
+  } catch (err) {
+    return res.send({ error: String(err) });
+  }
+});
+
 // Exporting the router to be used elsewhere
 module.exports = router;

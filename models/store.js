@@ -10,6 +10,7 @@ let StoreSchema = new Schema({
   number: String,
   name: String,
   district: String,
+  timezone: String,
   address: {
     street1: String,
     street2: String,

@@ -8,6 +8,12 @@
 // Import dependencies
 import React from 'react';
 import { Link } from 'react-router-dom';
+
+// Font awesome
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faTimes } from '@fortawesome/free-solid-svg-icons';
+
+// React bootstrap
 import Modal from 'react-bootstrap/Modal';
 import Button from 'react-bootstrap/Button';
 import Alert from 'react-bootstrap/Alert';
@@ -21,6 +27,7 @@ export default class AdminUserManage extends React.Component {
       employeename: '',
       isadmin: false,
 
+      search: '',
       selected: null,
       users: [],
 
@@ -44,6 +51,8 @@ export default class AdminUserManage extends React.Component {
 
     this.handleChange = this.handleChange.bind(this);
     this.handleKeyDown = this.handleKeyDown.bind(this);
+
+    this.clearSearch = this.clearSearch.bind(this);
   }
 
   async getAllUsers() {
@@ -120,11 +129,9 @@ export default class AdminUserManage extends React.Component {
     const pins = ['pin1', 'pin2', 'pin3', 'pin4'];
     if (pins.includes(target.name)) return;
 
-    /*const corrected = value.replace(/\D/g, '');
-
     this.setState({
-      [name]: event.target.name === 'employeenumber' ? corrected : value
-    });*/
+      [name]: value
+    });
   }
 
   // Handle individual keypresses
@@ -180,7 +187,17 @@ export default class AdminUserManage extends React.Component {
     });
   }
 
+  // Clear the search (button)
+  clearSearch() { this.setState({ search: '' }) }
+
   render() {
+    // Filter down the search results:
+    let searchresults = this.state.users.filter((user) => {
+      const searchterm = this.state.search.toLowerCase().replace(/\s+/g, ' ').trim();
+      const tosearch = user.name.toLowerCase() + ' ' + user.number;
+      return tosearch.includes(searchterm);
+    });
+
     // Get the object of the selected user
     const selectedUser = this.state.users.find(user => {
       return user.number === this.state.selected;
@@ -205,10 +222,21 @@ export default class AdminUserManage extends React.Component {
         {
           this.state.isadmin ?
             <>
-              <h6><strong>EMPLOYEE USER ACCOUNTS:</strong></h6>
+              <ol className="breadcrumb">
+                <li className="breadcrumb-item"><Link to="/">Toolbox</Link></li>
+                <li className="breadcrumb-item"><Link to="/admin">System Admin</Link></li>
+                <li className="breadcrumb-item active">User Management</li>
+              </ol>
+              <h5><strong>USER MANAGEMENT</strong></h5>
+              <div className="d-flex flex-direction-row mb-3">
+                <div className="mr-3 flex-grow-1">
+                  <input className="form-control" type="text" name="search" placeholder="Search by name or number" onChange={this.handleChange} value={this.state.search}/>
+                </div>
+                <Button variant="danger" disabled={this.state.search.length === 0} onClick={this.clearSearch}><FontAwesomeIcon icon={faTimes}/></Button>
+              </div>
               {this.state.success ? <Alert variant="success" onClose={() => { this.setState({ success: null }) }} dismissible>{this.state.success}</Alert> : null}
-              {this.state.users.length == 0 ? <p>No employee user accounts found.</p> :
-                this.state.users.map((user) => (
+              {searchresults.length == 0 ? <p>No employee user accounts found.</p> :
+                searchresults.map((user) => (
                   user.number === this.state.selected ? selected :
                     <div className="mb-2 border-bottom" style={{ "cursor": "pointer" }} onClick={this.selectUser} name={user.number} key={user.number}>
                       <h5 className="mb-1">{user.name}</h5>

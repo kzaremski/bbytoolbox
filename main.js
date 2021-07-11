@@ -74,6 +74,7 @@ mongoose.connect(process.env.MONGODB_URI, {
 
 // Mongoose models
 const Employee = require(path.join(__dirname, 'models/employee'));
+const Store = require(path.join(__dirname, 'models/store'));
 const IPAddress = require(path.join(__dirname, 'models/ipaddress'));
 const Login = require(path.join(__dirname, 'models/login'));
 
@@ -92,13 +93,19 @@ app.post('/currentuser', async (req, res) => {
     employeename: req.session.employeename,
     admin: req.session.admin,
     store: req.session.store,
-    defaultstore: req.session.defaultstore,
+    currentstore: req.session.currentstore
   });
 });
 
 // Get a list of all locations
 app.post('/getstores', async (req, res) => {
-
+  try {
+    if (!req.body.employeenumber) throw 'You need to be logged in to access this information';
+    let stores = Store.find();
+    return { stores: stores };
+  } catch(err) {
+    return { error: String(err) };
+  }
 });
 
 // Login database operations
@@ -115,7 +122,6 @@ async function login(employeenumber, pinnumber) {
       name: employee.name,
       number: employee.number,
       store: employee.store,
-      defaultstore: employee.defaultstore,
       admin: employee.admin
     };
   } catch(err) {
@@ -140,7 +146,7 @@ app.post('/login', (req, res) => {
       req.session.employeenumber = response.number;
       req.session.admin = response.admin;
       req.session.store = response.store;
-      req.session.defaultstore = response.store;
+      req.session.currentstore = response.store === 'all' ? '164' : response.store;
     }
     res.send(response);
   });
