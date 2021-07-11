@@ -13,8 +13,12 @@ const router = require('express').Router();
 
 // Mongoose Models
 const Employee = require(path.join(__dirname, 'models/employee'));
+const Store = require(path.join(__dirname, 'models/employee'));
 
-// Get all employees
+/**
+ * EMPLOYEES
+ */
+
 router.post('/getusers', async (req, res) => {
   // Authenticate
   if (!req.session.employeenumber) return res.send({ error: 'No login session has been detected' });
@@ -93,6 +97,38 @@ router.post('/editemployee', async (req, res) => {
     });
     // Notify
     return res.send({ success: 'Employee ' + req.body.employeenumber + ' was updated successfully.' });
+  } catch (err) {
+    return res.send({ error: String(err) });
+  }
+});
+
+/**
+ * STORES
+ */
+
+router.post('/newstore', async (req, res) => {
+  try {
+    // Authenticate
+    if (!req.session.employeenumber) throw 'No login session has been detected';
+    if (!req.session.admin) throw 'You do not have admin access';
+    // Validate
+    if (!req.body.number) throw 'Store number is not defined';
+    // Notify
+    return res.send({ success: 'Location ' + req.body.number.trim() + ' has been added!' });
+  } catch (err) {
+    return res.send({ error: String(err) });
+  }
+});
+
+router.post('/editstore', async (req, res) => {
+  try {
+    // Authenticate
+    if (!req.session.employeenumber) throw 'No login session has been detected';
+    if (!req.session.admin) throw 'You do not have admin access';
+    // Validate
+    if (!req.body.number) throw 'No store is selected';
+    // Notify
+    return res.send({ success: 'Location ' + req.body.employeenumber + ' was updated successfully.' });
   } catch (err) {
     return res.send({ error: String(err) });
   }
