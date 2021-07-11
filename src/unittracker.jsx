@@ -264,6 +264,10 @@ export default class SaleUnitTracker extends React.Component {
     // Calculate office attach percentage
     const officeattach = salestoday.oem + salestoday.surface > 0 ? salestoday.office / (salestoday.oem + salestoday.surface) : salestoday.office;
 
+    // Current date
+    let tzoffset = (new Date()).getTimezoneOffset() * 60000; //offset in milliseconds
+    let localISOTime = (new Date(Date.now() - tzoffset)).toISOString().slice(0, -1);
+
     return (
       <>
         <h5><strong>COMPUTING SALE UNIT TRACKER</strong></h5>
@@ -503,7 +507,7 @@ export default class SaleUnitTracker extends React.Component {
           </Modal.Header>
           <Modal.Body>
             <span>Location 0164 Computing Department End Of Day Sale Unit Totals</span><br/>
-            <span>Report for { new Date().toISOString().split('T')[0] }</span>
+            <span>Report for { localISOTime.split('T')[0] }</span>
             <div className="table-responsive">
               <table>
                 <thead>
