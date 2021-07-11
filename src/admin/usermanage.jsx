@@ -11,7 +11,7 @@ import { Link } from 'react-router-dom';
 
 // Font awesome
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faTimes } from '@fortawesome/free-solid-svg-icons';
+import { faTimes, faUserPlus, faUserEdit, faKey, faAssistiveListeningSystems } from '@fortawesome/free-solid-svg-icons';
 
 // React bootstrap
 import Modal from 'react-bootstrap/Modal';
@@ -31,11 +31,19 @@ export default class AdminUserManage extends React.Component {
       selected: null,
       users: [],
 
+      // Pin reset GUI
       pinreset: false,
       pin1: '',
       pin2: '',
       pin3: '',
       pin4: '',
+
+      // User edit / user creation
+      edituser: false,
+      name: '',
+      number: '',
+      store: '',
+      disabled: false,
 
       saving: false
     }
@@ -48,6 +56,10 @@ export default class AdminUserManage extends React.Component {
     this.openResetPIN = this.openResetPIN.bind(this);
     this.closeResetPIN = this.closeResetPIN.bind(this);
     this.resetPIN = this.resetPIN.bind(this);
+
+    this.openEditUser = this.openEditUser.bind(this);
+    this.closeEditUser = this.closeEditUser.bind(this);
+    this.editUser = this.editUser.bind(this);
 
     this.handleChange = this.handleChange.bind(this);
     this.handleKeyDown = this.handleKeyDown.bind(this);
@@ -108,6 +120,8 @@ export default class AdminUserManage extends React.Component {
   openResetPIN() {
     this.setState({
       pinreset: true,
+      success: null,
+      error: null,
       pin1: '',
       pin2: '',
       pin3: '',
@@ -119,15 +133,100 @@ export default class AdminUserManage extends React.Component {
     this.setState({ pinreset: false });
   }
 
+  // Open the user edit GUI
+  openEditUser() {
+    // Get the object of the selected user
+    const selectedUser = this.state.users.find(user => {
+      return user.number === this.state.selected;
+    });
+
+    this.setState({
+      edituser: true,
+      success: null,
+      error: null,
+
+      name: selectedUser.name || '',
+      number: selectedUser.number || '',
+      store: selectedUser.store || '',
+      disabled: selectedUser.disabled || false
+    });
+  }
+
+  closeEditUser() {
+    this.setState({ edituser: false });
+  }
+
+  // Open the new user GUI
+  openNewUser() {
+    this.setState({
+      newuser: true,
+      success: null,
+      error: null,
+
+      name: '',
+      number: '',
+      store: '',
+      disabled: false,
+
+      pin1: '',
+      pin2: '',
+      pin3: '',
+      pin4: ''
+    });
+  }
+
+  closeNewUser() {
+    this.setState({ newuser: false });
+  }
+
+  // Edit a user's information
+  editUser() {
+    this.setState({ saving: true }, async () => {
+      let data = {};
+      try {
+        // Load data
+        let response = await fetch('/admin/editemployee', {
+          method: 'POST',
+          mode: 'same-origin',
+          cache: 'no-cache',
+          credentials: 'same-origin',
+          body: JSON.stringify({
+            employeenumber: this.state.selected,
+            name: this.state.name,
+            store: this.state.store,
+            disabled: this.state.disabled,
+          }),
+          headers: {
+            'Content-Type': 'application/json'
+          }
+        }).then(response => response.json());
+        data = response;
+      } catch (err) {
+        console.log(err);
+        data = { error: 'There was an error parsing the response from the backend. Possible errors: 404, 500.' };
+      }
+
+      this.setState({
+        ...data,
+        saving: false
+      });
+
+      if (!data.error) this.closeEditUser();
+      this.getAllUsers();
+    });
+  }
+
   // Handle input changes
   handleChange(event) {
     const target = event.target;
-    const value = target.type === 'checkbox' ? target.checked : target.value;
+    let value = target.type === 'checkbox' ? target.checked : target.value;
     const name = target.name;
 
     // Do nothing for pin number
     const pins = ['pin1', 'pin2', 'pin3', 'pin4'];
     if (pins.includes(target.name)) return;
+
+    if (name === 'store' || name === 'number') value = value.replace(/\D/g, '');
 
     this.setState({
       [name]: value
@@ -174,7 +273,6 @@ export default class AdminUserManage extends React.Component {
         data = response;
       } catch (err) {
         console.log(err);
-        if (response) console.log(response);
         data = { error: 'There was an error parsing the response from the backend. Possible errors: 404, 500.' };
       }
 
@@ -184,6 +282,7 @@ export default class AdminUserManage extends React.Component {
       });
 
       if (!data.error) this.closeResetPIN();
+      this.getAllUsers();
     });
   }
 
@@ -194,7 +293,7 @@ export default class AdminUserManage extends React.Component {
     // Filter down the search results:
     let searchresults = this.state.users.filter((user) => {
       const searchterm = this.state.search.toLowerCase().replace(/\s+/g, ' ').trim();
-      const tosearch = user.name.toLowerCase() + ' ' + user.number;
+      const tosearch = user.name.toLowerCase() + ' a' + user.number + ' ' + user.number;
       return tosearch.includes(searchterm);
     });
 
@@ -205,15 +304,18 @@ export default class AdminUserManage extends React.Component {
 
     const selected = this.state.selected ? (
       <div className="bg-light p-3 my-3" key={selectedUser.number}>
+        {this.state.success ? <Alert variant="success" onClose={() => { this.setState({ success: null }) }} dismissible>{this.state.success}</Alert> : null}
         <h5 className="mb-1">{selectedUser.name}</h5>
         {this.state.error ? <Alert variant="danger" onClose={() => { this.setState({ error: null }) }} dismissible>{this.state.error}</Alert> : null}
         <div className="row mb-2">
-          <div className="col-md-4">Employee: {selectedUser.number}</div>
-          <div className="col-md-4">Admin: {selectedUser.admin ? 'YES' : 'NO'}</div>
-          <div className="col-md-4">Disabled: {selectedUser.disabled ? 'YES' : 'NO'}</div>
+          <div className="col-md-3">A{selectedUser.number}</div>
+          <div className="col-md-3">Store: {selectedUser.store || 'N/A'}</div>
+          <div className="col-md-3">Admin: {selectedUser.admin ? 'Yes' : 'No'}</div>
+          <div className="col-md-3">Disabled: {selectedUser.disabled ? 'Yes' : 'No'}</div>
         </div>
-        <button className="btn btn-primary mr-2" onClick={this.openResetPIN}>Reset PIN</button>
-        <button className="btn btn-secondary" onClick={this.deselectUser}>Cancel</button>
+        <Button variant="primary" className="mr-2" onClick={this.openResetPIN}><FontAwesomeIcon icon={faKey} className="mr-2" />Reset PIN</Button>
+        <Button variant="info" className="mr-2" onClick={this.openEditUser}><FontAwesomeIcon icon={faUserEdit} className="mr-2" />Edit user</Button>
+        <Button variant="secondary" onClick={this.deselectUser}><FontAwesomeIcon icon={faTimes} className="mr-2" />Cancel</Button>
       </div>
     ) : null;
 
@@ -227,27 +329,33 @@ export default class AdminUserManage extends React.Component {
                 <li className="breadcrumb-item"><Link to="/admin">System Admin</Link></li>
                 <li className="breadcrumb-item active">User Management</li>
               </ol>
-              <h5><strong>USER MANAGEMENT</strong></h5>
+              <div className="d-flex flex-direction-row align-items-start mb-2">
+                <h5 className="mt-1"><strong>USER MANAGEMENT</strong></h5>
+                <Button variant="success" className="ml-auto"><FontAwesomeIcon icon={faUserPlus} className="mr-2" />New user</Button>
+              </div>
               <div className="d-flex flex-direction-row mb-3">
                 <div className="mr-3 flex-grow-1">
-                  <input className="form-control" type="text" name="search" placeholder="Search by name or number" onChange={this.handleChange} value={this.state.search}/>
+                  <input className="form-control" type="text" name="search" placeholder="Search by name or number" onChange={this.handleChange} value={this.state.search} />
                 </div>
-                <Button variant="danger" disabled={this.state.search.length === 0} onClick={this.clearSearch}><FontAwesomeIcon icon={faTimes}/></Button>
+                <Button variant="danger" disabled={this.state.search.length === 0} onClick={this.clearSearch}><FontAwesomeIcon icon={faTimes} /></Button>
               </div>
-              {this.state.success ? <Alert variant="success" onClose={() => { this.setState({ success: null }) }} dismissible>{this.state.success}</Alert> : null}
+              {this.state.search.length > 0 ? <p className="small">Search results ({searchresults.length})</p> : null}
+
               {searchresults.length == 0 ? <p>No employee user accounts found.</p> :
                 searchresults.map((user) => (
                   user.number === this.state.selected ? selected :
                     <div className="mb-2 border-bottom" style={{ "cursor": "pointer" }} onClick={this.selectUser} name={user.number} key={user.number}>
                       <h5 className="mb-1">{user.name}</h5>
                       <div className="row">
-                        <div className="col-md-4">Employee: {user.number}</div>
-                        <div className="col-md-4">Admin: {user.admin ? 'YES' : 'NO'}</div>
-                        <div className="col-md-4">Disabled: {user.disabled ? 'YES' : 'NO'}</div>
+                        <div className="col-md-3">A{user.number}</div>
+                        <div className="col-md-3">Store: {user.store || 'N/A'}</div>
+                        <div className="col-md-3">Admin: {user.admin ? 'Yes' : 'No'}</div>
+                        <div className="col-md-3">Disabled: {user.disabled ? 'Yes' : 'No'}</div>
                       </div>
                     </div>
                 ))
               }
+
               <Modal show={this.state.saving} size="sm" onHide={() => { return }}>
                 <Modal.Body className="bg-warning">
                   <div className="d-flex flex-direction-column align-items-center justify-content-middle">
@@ -255,6 +363,45 @@ export default class AdminUserManage extends React.Component {
                   </div>
                   <h5 className="text-center text-white mb-0 mt-3 d-block">Saving Changes</h5>
                 </Modal.Body>
+              </Modal>
+
+              <Modal show={this.state.edituser && !this.state.saving} onHide={this.closeEditUser}>
+                <Modal.Header closeButton>
+                  <Modal.Title>Edit User (A{this.state.selected})</Modal.Title>
+                </Modal.Header>
+                <Modal.Body>
+                  {this.state.error ? <Alert variant="danger" onClose={() => { this.setState({ error: null }) }} dismissible>{this.state.error}</Alert> : null}
+                  <div className="form-group row">
+                    <label htmlFor="number-edit" className="col-sm-2 col-form-label">Number</label>
+                    <div className="col-sm-10">
+                      <input type="text" readOnly className="form-control-plaintext" id="number-edit" value={this.state.number} />
+                    </div>
+                  </div>
+                  <div className="form-group row">
+                    <label htmlFor="name-edit" className="col-sm-2 col-form-label">Name</label>
+                    <div className="col-sm-10">
+                      <input type="text" className="form-control" id="name-edit" value={this.state.name} onChange={this.handleChange} name="name" />
+                    </div>
+                  </div>
+                  <div className="form-group row">
+                    <label htmlFor="store-edit" className="col-sm-2 col-form-label">Location</label>
+                    <div className="col-sm-10">
+                      <input type="number" className="form-control" min="0" max="50000" id="store-edit" value={this.state.store} onChange={this.handleChange} name="store" />
+                    </div>
+                  </div>
+                  <div className="form-group row">
+                    <label htmlFor="disabled-edit" className="col-sm-2 col-form-label">Disabled</label>
+                    <div className="col-sm-10">
+                      <div className="form-check pt-2">
+                        <input className="form-check-input" type="checkbox" id="disabled-edit" name="disabled" checked={ this.state.disabled } onChange={this.handleChange} value=""/>
+                      </div>
+                    </div>
+                  </div>
+                </Modal.Body>
+                <Modal.Footer>
+                  <Button variant="secondary" onClick={this.closeEditUser}>Cancel</Button>
+                  <Button variant="primary" onClick={this.editUser}>Submit</Button>
+                </Modal.Footer>
               </Modal>
 
               <Modal show={this.state.pinreset && !this.state.saving} onHide={this.closeResetPIN}>

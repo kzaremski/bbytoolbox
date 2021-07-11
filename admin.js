@@ -69,10 +69,17 @@ router.post('/editemployee', async (req, res) => {
     if (!req.session.employeenumber) throw 'No login session has been detected';
     if (!req.session.admin) throw 'You do not have admin access';
     // Validate
-
+    if (!req.body.employeenumber) throw 'No employee is selected';
     // Update database
-
+    const nametrim = req.body.name.replace(/\s+/g, ' ').trim();
+    const namecapitalized = nametrim.replace(/\b\w/g, l => l.toUpperCase());
+    await Employee.findOneAndUpdate({ number: req.body.employeenumber }, {
+      name: namecapitalized,
+      store: parseInt(req.body.store.replace(/\D/g, '')).toString(),
+      disabled: req.body.disabled
+    });
     // Notify
+    return res.send({ success: 'Employee ' + req.body.employeenumber + ' was updated successfully.' });
   } catch (err) {
     return res.send({ error: String(err) });
   }
