@@ -48,16 +48,29 @@ router.post('/setpin', async (req, res) => {
   }
 });
 
-router.post('/addemployee', async (req, res) => {
+router.post('/newemployee', async (req, res) => {
   try {
     // Authenticate
     if (!req.session.employeenumber) throw 'No login session has been detected';
     if (!req.session.admin) throw 'You do not have admin access';
     // Validate
-
+    if (!req.body.number) throw 'Employee number is not defined';
+    if (!req.body.name) throw 'Employee name is not defined';
+    if (!req.body.store) throw 'No primary store has been provided';
+    if (!req.body.pin || req.body.pin.replace(' ', '').length === 0) throw 'Employee login PIN is not set';
     // Update database
-
+    const nametrim = req.body.name.replace(/\s+/g, ' ').trim();
+    const namecapitalized = nametrim.replace(/\b\w/g, l => l.toUpperCase());
+    await new Employee({
+      number: parseInt(req.body.number.replace(/\D/g, '')).toString(),
+      name: namecapitalized,
+      store: parseInt(req.body.store.replace(/\D/g, '')).toString(),
+      disabled: req.body.disabled || false,
+      admin: false,
+      pin: req.body.pin
+    }).save();
     // Notify
+    return res.send({ success: 'Employee ' + req.body.number.trim() + ' has been added!' });
   } catch (err) {
     return res.send({ error: String(err) });
   }

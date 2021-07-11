@@ -18,6 +18,8 @@ import Modal from 'react-bootstrap/Modal';
 import Button from 'react-bootstrap/Button';
 import Alert from 'react-bootstrap/Alert';
 
+import PINinput from '../components/pininput.jsx';
+
 export default class AdminUserManage extends React.Component {
   constructor(props) {
     super(props);
@@ -40,6 +42,7 @@ export default class AdminUserManage extends React.Component {
 
       // User edit / user creation
       edituser: false,
+      newuser: false,
       name: '',
       number: '',
       store: '',
@@ -53,6 +56,8 @@ export default class AdminUserManage extends React.Component {
     this.deselectUser = this.deselectUser.bind(this);
     this.getAllUsers = this.getAllUsers.bind(this);
 
+    this.setStateAsync = this.setStateAsync.bind(this);
+
     this.openResetPIN = this.openResetPIN.bind(this);
     this.closeResetPIN = this.closeResetPIN.bind(this);
     this.resetPIN = this.resetPIN.bind(this);
@@ -61,10 +66,20 @@ export default class AdminUserManage extends React.Component {
     this.closeEditUser = this.closeEditUser.bind(this);
     this.editUser = this.editUser.bind(this);
 
+    this.openNewUser = this.openNewUser.bind(this);
+    this.closeNewUser = this.closeNewUser.bind(this);
+    this.newUser = this.newUser.bind(this);
+
     this.handleChange = this.handleChange.bind(this);
     this.handleKeyDown = this.handleKeyDown.bind(this);
 
     this.clearSearch = this.clearSearch.bind(this);
+  }
+
+  setStateAsync(state) {
+    return new Promise((resolve) => {
+      this.setState(state, resolve)
+    });
   }
 
   async getAllUsers() {
@@ -85,7 +100,8 @@ export default class AdminUserManage extends React.Component {
       console.log(err);
       data = { error: 'There was an error while loading the list of employees.' };
     }
-    this.setState({ ...data });
+    await this.setStateAsync({ ...data });
+    return true;
   }
 
   componentDidMount() {
@@ -156,29 +172,6 @@ export default class AdminUserManage extends React.Component {
     this.setState({ edituser: false });
   }
 
-  // Open the new user GUI
-  openNewUser() {
-    this.setState({
-      newuser: true,
-      success: null,
-      error: null,
-
-      name: '',
-      number: '',
-      store: '',
-      disabled: false,
-
-      pin1: '',
-      pin2: '',
-      pin3: '',
-      pin4: ''
-    });
-  }
-
-  closeNewUser() {
-    this.setState({ newuser: false });
-  }
-
   // Edit a user's information
   editUser() {
     this.setState({ saving: true }, async () => {
@@ -213,6 +206,74 @@ export default class AdminUserManage extends React.Component {
 
       if (!data.error) this.closeEditUser();
       this.getAllUsers();
+    });
+  }
+
+  // Open the new user GUI
+  openNewUser() {
+    this.clearSearch();
+    this.deselectUser();
+    this.setState({
+      newuser: true,
+      success: null,
+      error: null,
+
+      name: '',
+      number: '',
+      store: '',
+      disabled: false,
+
+      newuserpin: ''
+    });
+  }
+
+  closeNewUser() {
+    this.setState({ newuser: false });
+  }
+
+  newUser() {
+    if (this.state.name == '' || this.state.number == '' || this.state.store == '' || this.state.newuserpin.replace(' ', '').length == 0) return;
+
+    this.setState({ saving: true }, async () => {
+      let data = {};
+      try {
+        // Load data
+        let response = await fetch('/admin/newemployee', {
+          method: 'POST',
+          mode: 'same-origin',
+          cache: 'no-cache',
+          credentials: 'same-origin',
+          body: JSON.stringify({
+            number: this.state.number,
+            name: this.state.name,
+            store: this.state.store,
+            disabled: this.state.disabled,
+            pin: this.state.newuserpin,
+          }),
+          headers: {
+            'Content-Type': 'application/json'
+          }
+        }).then(response => response.json());
+        data = response;
+      } catch (err) {
+        console.log(err);
+        data = { error: 'There was an error parsing the response from the backend. Possible errors: 404, 500.' };
+      }
+      
+      this.setState({
+        ...data,
+      });
+
+      
+      this.setState({ saving: false });
+      
+      if (!data.error) {
+        this.closeNewUser();
+        await this.getAllUsers().then(() => {
+          this.setState({ selected: this.state.number });
+          document.getElementById('selecteduser').scrollIntoView();
+         });
+      };
     });
   }
 
@@ -302,8 +363,8 @@ export default class AdminUserManage extends React.Component {
       return user.number === this.state.selected;
     });
 
-    const selected = this.state.selected ? (
-      <div className="bg-light p-3 my-3" key={selectedUser.number}>
+    const selected = this.state.selected && selectedUser ? (
+      <div className="bg-light p-3 my-3" key={selectedUser.number} id="selecteduser">
         {this.state.success ? <Alert variant="success" onClose={() => { this.setState({ success: null }) }} dismissible>{this.state.success}</Alert> : null}
         <h5 className="mb-1">{selectedUser.name}</h5>
         {this.state.error ? <Alert variant="danger" onClose={() => { this.setState({ error: null }) }} dismissible>{this.state.error}</Alert> : null}
@@ -331,7 +392,7 @@ export default class AdminUserManage extends React.Component {
               </ol>
               <div className="d-flex flex-direction-row align-items-start mb-2">
                 <h5 className="mt-1"><strong>USER MANAGEMENT</strong></h5>
-                <Button variant="success" className="ml-auto"><FontAwesomeIcon icon={faUserPlus} className="mr-2" />New user</Button>
+                <Button variant="success" className="ml-auto" onClick={this.openNewUser}><FontAwesomeIcon icon={faUserPlus} className="mr-2" />New user</Button>
               </div>
               <div className="d-flex flex-direction-row mb-3">
                 <div className="mr-3 flex-grow-1">
@@ -401,6 +462,50 @@ export default class AdminUserManage extends React.Component {
                 <Modal.Footer>
                   <Button variant="secondary" onClick={this.closeEditUser}>Cancel</Button>
                   <Button variant="primary" onClick={this.editUser}>Submit</Button>
+                </Modal.Footer>
+              </Modal>
+
+              <Modal show={this.state.newuser && !this.state.saving} onHide={this.closeNewUser}>
+                <Modal.Header closeButton>
+                  <Modal.Title>New User</Modal.Title>
+                </Modal.Header>
+                <Modal.Body>
+                  {this.state.error ? <Alert variant="danger" onClose={() => { this.setState({ error: null }) }} dismissible>{this.state.error}</Alert> : null}
+                  
+                  <p>Give a new employee access to the unit tracker application.</p>
+
+                  <div className="form-group row">
+                    <label htmlFor="number-new" className="col-sm-2 col-form-label">Number</label>
+                    <div className="col-sm-10">
+                      <input type="text" className="form-control" id="number-new" value={this.state.number} onChange={this.handleChange} name="number"/>
+                    </div>
+                  </div>
+                  <div className="form-group row">
+                    <label htmlFor="name-new" className="col-sm-2 col-form-label">Name</label>
+                    <div className="col-sm-10">
+                      <input type="text" className="form-control" id="name-new" value={this.state.name} onChange={this.handleChange} name="name" />
+                    </div>
+                  </div>
+                  <div className="form-group row">
+                    <label htmlFor="store-new" className="col-sm-2 col-form-label">Location</label>
+                    <div className="col-sm-10">
+                      <input type="number" className="form-control" min="0" max="50000" id="store-new" value={this.state.store} onChange={this.handleChange} name="store" />
+                    </div>
+                  </div>
+                  <div className="form-group row">
+                    <label htmlFor="disabled-new" className="col-sm-2 col-form-label">Disabled</label>
+                    <div className="col-sm-10">
+                      <div className="form-check pt-2">
+                        <input className="form-check-input" type="checkbox" id="disabled-new" name="disabled" checked={ this.state.disabled } onChange={this.handleChange} value=""/>
+                      </div>
+                    </div>
+                  </div>
+                  <label>Login PIN</label>
+                  <PINinput name="newuserpin" onChange={this.handleChange} value={this.state.newuserpin}/>
+                </Modal.Body>
+                <Modal.Footer>
+                  <Button variant="secondary" onClick={this.closeNewUser}>Cancel</Button>
+                  <Button variant="primary" onClick={this.newUser} disabled={ this.state.name == '' || this.state.number == '' || this.state.store == '' || this.state.newuserpin.replace(' ', '').length == 0 }>Submit</Button>
                 </Modal.Footer>
               </Modal>
 

@@ -87,7 +87,7 @@ class App extends Component {
     return (
       <Router>
         <Navbar/>
-        <div className="container pt-3" style={{ 'marginTop': '61px' }}>
+        <div className="container py-3" style={{ 'marginTop': '61px' }}>
           { this.state.loaded && this.state.employeenumber == null ? <Login/> : <>
             <Switch>
               <Route path="/" exact component={Home}/>
