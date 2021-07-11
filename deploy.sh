@@ -10,27 +10,41 @@ echo "Beginning automated deployment."
 
 # Install required packages
 echo "  Installing necessary packages."
-sudo apt install -y unzip nodejs npm
+apt install -y unzip nodejs npm
 
 # Create the /etc/bbytoolbox directory if it does not already exist
 echo "  Creating '/etc/bbytoolbox'."
-sudo mkdir -p /etc/bbytoolbox
+mkdir -p /etc/bbytoolbox
 
-# Work out of /tmp
-cd /tmp
-echo "  New working directory: '/tmp'."
+# Change the working directory to /etc/bbytoolbox
+cd /etc/bbytoolbox
+echo "  New working directory: '/etc/bbytoolbox'."
+
+# Delete all installation files in /etc/bbytoolbox
+echo "  Cleaning installation directory."
+rm -rf *
 
 # Download the latest snapshot of the master branch
 echo "  Downloading latest production package from GitHub."
-wget https://github.com/kzaremski/bbytoolbox/archive/refs/heads/main.zip -O main.zip
+wget https://github.com/kzaremski/bbytoolbox/archive/refs/heads/main.zip
 
 # Unzip the file
 echo "  Extracting package."
-unzip -qq -o main.zip
+unzip -qq main.zip
 
-# Go into the extracted package
-cd bbytoolbox-main
-echo "  New working directory: /tmp/bbytoolbox-main"
+# Move the files from the unzipped folder in to the main directory to
+# overwrite the existing ones within the installation directory
+echo "  Installing package."
+cp -ra bbytoolbox-main/* ./
+
+# Delete the ZIP file & folder
+echo "  Cleaning up installation files."
+rm main.zip
+rm -r bbytoolbox-main
+
+# Copy the systemd unit file
+echo "  Registering systemd unit file."
+cp bbytoolbox.service /etc/systemd/system
 
 # Install the node-js modules
 echo "  Installing node modules."
@@ -39,22 +53,6 @@ npm install
 # Build the React code into a production grade blob
 echo "  Compiling production React code."
 npm run build
-
-# Change the working directory to /etc/bbytoolbox
-cd /etc/bbytoolbox
-echo "  New working directory: '/etc/bbytoolbox'."
-
-# Delete all installation files in /etc/bbytoolbox
-echo "  Cleaning installation directory."
-sudo rm -rf *
-
-# Copy new files
-echo "  Installing package."
-sudo cp -r /tmp/bbytoolbox-main/* ./
-
-# Copy the systemd unit file
-echo "  Registering systemd unit file."
-sudo cp bbytoolbox.service /etc/systemd/system
 
 # Set permissions/ownership of files
 echo "  Setting ownership of installation files to the 'node' user."
