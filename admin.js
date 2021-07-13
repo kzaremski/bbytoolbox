@@ -13,7 +13,7 @@ const router = require('express').Router();
 
 // Mongoose Models
 const Employee = require(path.join(__dirname, 'models/employee'));
-const Store = require(path.join(__dirname, 'models/employee'));
+const Store = require(path.join(__dirname, 'models/store'));
 
 /**
  * EMPLOYEES
@@ -105,7 +105,6 @@ router.post('/editemployee', async (req, res) => {
 /**
  * STORES
  */
-
 router.post('/newstore', async (req, res) => {
   try {
     // Authenticate
@@ -113,6 +112,29 @@ router.post('/newstore', async (req, res) => {
     if (!req.session.admin) throw 'You do not have admin access';
     // Validate
     if (!req.body.number) throw 'Store number is not defined';
+    // Check for existing stores
+    const storenumber = parseInt(req.body.number.replace(/\s+/g, ' ').trim()).toString();
+    const existing = await Store.findOne({ number: storenumber });
+    if (existing) throw 'A store already exists with that location number';
+    // Validate
+    if (!req.body.name) throw 'Store location name is not defined';
+    if (!req.body.timezone) throw 'Store timezone is not defined';
+    // Insert new store into database
+    const blankstore = {
+      number: '',
+      name: '',
+      district: '',
+      timezone: '',
+      address: {
+        street1: '',
+        street2: '',
+        city: '',
+        state: '',
+        zip: ''
+      }
+    }
+    const newstore = { ...blankstore, ...req.body, number: storenumber }
+    await new Store(newstore).save();
     // Notify
     return res.send({ success: 'Location ' + req.body.number.trim() + ' has been added!' });
   } catch (err) {

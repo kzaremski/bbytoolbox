@@ -46,6 +46,7 @@ export default class AdminUserManage extends React.Component {
       name: '',
       number: '',
       store: '',
+      newuserpin: '',
       disabled: false,
 
       saving: false

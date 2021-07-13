@@ -22,6 +22,7 @@ import UserSettings from './usersettings.jsx';
 // Admin
 import Admin from './admin/admin.jsx';
 import AdminUserManage from './admin/usermanage.jsx';
+import AdminStoreManage from './admin/storemanage.jsx';
 
 // The main App component
 class App extends Component {
@@ -92,8 +93,11 @@ class App extends Component {
             <Switch>
               <Route path="/" exact component={Home}/>
               <Route path="/saletracker" exact component={SaleUnitTracker}/>
+
               <Route path="/admin" exact component={Admin}/>
               <Route path="/admin/usermanage" exact component={AdminUserManage}/>
+              <Route path="/admin/storemanage" exact component={AdminStoreManage}/>
+
               <Route path="/user" exact component={UserSettings}/>
             </Switch>
           </> }

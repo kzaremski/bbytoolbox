@@ -5,7 +5,7 @@
   "main": "main.js",
   "scripts": {
     "build": "webpack --mode production",
-    "sass": "sass --watch ./scss/bootstrap.scss ./static/css/bootstrap.css",
+    "sass": "sass ./scss/bootstrap.scss ./static/css/bootstrap.css",
     "dev": "webpack --watch --mode development",
     "start": "node main.js"
   },
