@@ -100,11 +100,11 @@ app.post('/currentuser', async (req, res) => {
 // Get a list of all locations
 app.post('/getstores', async (req, res) => {
   try {
-    if (!req.body.employeenumber) throw 'You need to be logged in to access this information';
-    let stores = Store.find();
-    return { stores: stores };
+    if (!req.session.employeenumber) throw 'You need to be logged in to access this information';
+    let stores = await Store.find();
+    return res.send({ stores: stores });
   } catch(err) {
-    return { error: String(err) };
+    return res.send({ error: String(err) });
   }
 });
 
