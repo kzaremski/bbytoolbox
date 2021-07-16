@@ -168,16 +168,23 @@ export default class AdminStoreManage extends React.Component {
       let data = {};
       try {
         // Load data
-        let response = await fetch('/admin/editemployee', {
+        let response = await fetch('/admin/editstore', {
           method: 'POST',
           mode: 'same-origin',
           cache: 'no-cache',
           credentials: 'same-origin',
           body: JSON.stringify({
-            employeenumber: this.state.selected,
+            number: this.state.number,
             name: this.state.name,
-            store: this.state.store,
-            disabled: this.state.disabled,
+            district: this.state.district,
+            timezone: this.state.timezone,
+            address: {
+              street1: this.state.street1,
+              street2: this.state.street2,
+              city: this.state.city,
+              state: this.state.state,
+              zip: this.state.zip
+            }
           }),
           headers: {
             'Content-Type': 'application/json'
@@ -194,8 +201,8 @@ export default class AdminStoreManage extends React.Component {
         saving: false
       });
 
-      if (!data.error) this.closeEditUser();
-      this.getAllUsers();
+      if (!data.error) this.closeEditStore();
+      this.getAllStores();
     });
   }
 
@@ -263,7 +270,6 @@ export default class AdminStoreManage extends React.Component {
       this.setState({
         ...data,
       });
-
 
       this.setState({ saving: false });
 
@@ -376,27 +382,27 @@ export default class AdminStoreManage extends React.Component {
             <p>Edit the information for an existing location.</p>
 
             <div className="form-group row">
-              <label htmlFor="number-new" className="col-sm-2 col-form-label">Number</label>
+              <label htmlFor="number-edit" className="col-sm-2 col-form-label">Number</label>
               <div className="col-sm-10">
                 <p className="mt-2 mb-0">{this.state.number}</p>
               </div>
             </div>
             <div className="form-group row">
-              <label htmlFor="name-new" className="col-sm-2 col-form-label">Name</label>
+              <label htmlFor="name-edit" className="col-sm-2 col-form-label">Name</label>
               <div className="col-sm-10">
-                <input type="text" className="form-control" id="name-new" value={this.state.name} onChange={this.handleChange} name="name" />
+                <input type="text" className="form-control" id="name-edit" value={this.state.name} onChange={this.handleChange} name="name" />
               </div>
             </div>
             <div className="form-group row">
-              <label htmlFor="timezone-new" className="col-sm-2 col-form-label">Time Zone</label>
+              <label htmlFor="timezone-edit" className="col-sm-2 col-form-label">Time Zone</label>
               <div className="col-sm-10">
-                <TimeZoneSelectorInput value={this.state.timezone} id="timezone-new" onChange={this.handleChange} name="timezone" />
+                <TimeZoneSelectorInput value={this.state.timezone} id="timezone-edit" onChange={this.handleChange} name="timezone" />
               </div>
             </div>
             <div className="form-group row">
-              <label htmlFor="district-new" className="col-sm-2 col-form-label">District</label>
+              <label htmlFor="district-edit" className="col-sm-2 col-form-label">District</label>
               <div className="col-sm-10">
-                <input type="text" className="form-control" id="district-new" value={this.state.district} onChange={this.handleChange} name="district" />
+                <input type="text" className="form-control" id="district-edit" value={this.state.district} onChange={this.handleChange} name="district" />
               </div>
             </div>
             <label>Address</label>

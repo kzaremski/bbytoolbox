@@ -136,7 +136,7 @@ router.post('/newstore', async (req, res) => {
     const newstore = { ...blankstore, ...req.body, number: storenumber }
     await new Store(newstore).save();
     // Notify
-    return res.send({ success: 'Location ' + req.body.number.trim() + ' has been added!' });
+    return res.send({ success: 'Location ' + storenumber + ' has been added!' });
   } catch (err) {
     return res.send({ error: String(err) });
   }
@@ -149,8 +149,19 @@ router.post('/editstore', async (req, res) => {
     if (!req.session.admin) throw 'You do not have admin access';
     // Validate
     if (!req.body.number) throw 'No store is selected';
+    // Check for existing stores
+    const storenumber = parseInt(req.body.number.replace(/\s+/g, ' ').trim()).toString();
+    console.log
+    const existing = await Store.findOne({ number: storenumber });
+    if (!existing) throw 'A store does not exist with that number';
+    // Validate
+    if (!req.body.name) throw 'Store location name is not defined';
+    if (!req.body.timezone) throw 'Store timezone is not defined';
+    // Update database
+    const cast = { ...req.body, number: storenumber };
+    await Store.findOneAndUpdate({ number: storenumber }, cast);
     // Notify
-    return res.send({ success: 'Location ' + req.body.employeenumber + ' was updated successfully.' });
+    return res.send({ success: 'Location ' + storenumber + ' was updated successfully.' });
   } catch (err) {
     return res.send({ error: String(err) });
   }
