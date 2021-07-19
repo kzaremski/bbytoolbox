@@ -1,5 +1,5 @@
 /**
- * 164 Toolbox
+ * BBY Toolbox
  * -- Konstantin Zaremski
  * -- June 19, 2021
  * -- See details in LICENSE
@@ -43,6 +43,7 @@ router.post('/submitsale', async (req, res) => {
     const sale = {
       // Hard assumption of mountain time
       date: utcToZonedTime(new Date().toISOString(), timezone),
+      store: req.session.store,
       timezone: timezone,
       employee: employee,
       units: units
@@ -83,6 +84,7 @@ router.post('/submitgoals', async (req, res) => {
             date: new Date()
           }
         ],
+        store: req.session.store,
         units: units
       };
       await new ComputingSaleGoal(newgoals).save();
@@ -102,7 +104,7 @@ router.post('/submitgoals', async (req, res) => {
         units: units
       };
       // Find the record and update it
-      await ComputingSaleGoal.findOneAndUpdate({ date: utcToZonedTime(new Date().toISOString(), 'America/Denver').toISOString().split('T')[0] }, newgoals);
+      await ComputingSaleGoal.findOneAndUpdate({ date: utcToZonedTime(new Date().toISOString(), 'America/Denver').toISOString().split('T')[0], store: req.session.store }, newgoals);
     }
     // Notify the user if all is fine and dandy
     return res.send({ success: 'Todays goals have been updated!' });
@@ -128,11 +130,14 @@ router.post('/getsales', async (req, res) => {
     let sales = await ComputingSale.aggregate([{
       "$match": {
         "date": { "$gte": begin, "$lt": end }
+      },
+      "$match": {
+        "store": req.session.store
       }
     }]);
     // Find today's sales goals
-    let goals = await ComputingSaleGoal.findOne({ date: utcToZonedTime(new Date().toISOString(), 'America/Denver').toISOString().split('T')[0] });
-    if (goals) goals = goals.units;
+    let goals = await ComputingSaleGoal.findOne({ store: req.session.store, date: utcToZonedTime(new Date().toISOString(), 'America/Denver').toISOString().split('T')[0] });
+    if (goals) goals = goals.units; 
     // Return the results to the user
     return res.send({ sales: sales, goals: goals });
   } catch(err) {

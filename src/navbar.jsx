@@ -15,6 +15,8 @@ import Modal from 'react-bootstrap/Modal';
 import Button from 'react-bootstrap/Button';
 import Alert from 'react-bootstrap/Alert';
 
+import { Redirect } from 'react-router';
+
 export default class Navbar extends React.Component {
   constructor(props) {
     super(props);
@@ -109,7 +111,8 @@ export default class Navbar extends React.Component {
         }
       }).then(response => response.json());
       data = response;
-    } catch (err) {s
+    } catch (err) {
+      s
       console.log(err);
       data = { error: 'There was an error while changing the active store' };
     }
@@ -152,7 +155,10 @@ export default class Navbar extends React.Component {
             {this.state.error ? <Alert variant="danger" onClose={() => { this.setState({ error: null }) }} dismissible>{this.state.error}</Alert> : null}
             {this.state.success ? <Alert variant="success" onClose={() => { this.setState({ success: null }) }} dismissible>{this.state.success}</Alert> : null}
             {this.state.loading ? <Alert variant="warning">Loading a list of current stores</Alert> : null}
-            {this.state.changing ? <Alert variant="warning">Your current store is being changed</Alert> : null}
+            {this.state.changing ? <>
+              <Alert variant="warning">Your current store is being changed</Alert>
+              <Redirect to="/" />
+            </> : null}
 
             <p>As an employee with access to multiple stores, choose the one you would like to use the application as.</p>
 
