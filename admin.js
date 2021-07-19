@@ -71,6 +71,8 @@ router.post('/newemployee', async (req, res) => {
       store: parseInt(req.body.store.replace(/\D/g, '')).toString(),
       disabled: req.body.disabled || false,
       admin: false,
+      multistore: false,
+      storeadmin: false,
       pin: req.body.pin
     }).save();
     // Notify

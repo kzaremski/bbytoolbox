@@ -56,16 +56,22 @@ class App extends Component {
       // Set the global variables
       window.employeenumber = account.employeenumber;
       window.employeename = account.employeename;
+      window.multistore = account.multistore;
+      window.store = account.store;
       window.isadmin = account.admin;
     } catch(err) {
       // Set the global variables
       window.employeenumber = null;
       window.employeename = null;
+      window.multistore = null;
+      window.store = null;
       window.isadmin = false;
     }
     this.setState({
       employeenumber: window.employeenumber,
       employeename: window.employeename,
+      multistore: window.multistore,
+      store: window.store,
       isadmin: window.isadmin
     });
   }
@@ -87,7 +93,7 @@ class App extends Component {
   render() {
     return (
       <Router>
-        <Navbar/>
+        <Navbar storenumber={this.state.store} multistore={this.state.multistore}/>
         <div className="container py-3" style={{ 'marginTop': '61px' }}>
           { this.state.loaded && this.state.employeenumber == null ? <Login/> : <>
             <Switch>

@@ -47,6 +47,7 @@ export default class Login extends React.Component {
         if (data.success) {
           window.employeenumber = data.name;
           window.employeename = data.number;
+          window.store = data.store;
         }
         if (data.error) throw data.error;
         return data;

@@ -99,7 +99,7 @@ export default class AdminStoreManage extends React.Component {
       data = response;
     } catch (err) {
       console.log(err);
-      data = { error: 'There was an error while loading the list of employees.' };
+      data = { error: 'There was an error while loading the list of stores.' };
     }
 
     await this.setStateAsync({ ...data });
