@@ -93,18 +93,33 @@ app.post('/currentuser', async (req, res) => {
     employeename: req.session.employeename,
     admin: req.session.admin,
     store: req.session.store,
-    currentstore: req.session.currentstore
+    multistore: req.session.multistore
   });
 });
 
 // Get a list of all locations
 app.post('/getstores', async (req, res) => {
   try {
-    if (!req.body.employeenumber) throw 'You need to be logged in to access this information';
-    let stores = Store.find();
-    return { stores: stores };
+    if (!req.session.employeenumber) throw 'You need to be logged in to access this information';
+    let stores = await Store.find();
+    return res.send({ stores: stores });
   } catch(err) {
-    return { error: String(err) };
+    return res.send({ error: String(err) });
+  }
+});
+
+// Change the current store if multistore
+app.post('/changestore', async (req, res) => {
+  try {
+    if (!req.session.employeenumber) throw 'You need to be logged in to change stores';
+    if (!req.body.store) throw 'No store selected';
+    if (!req.session.multistore) throw 'You are not permitted to change stores';
+    const store = await Store.find({ number: req.body.store });
+    if (!store) throw 'The selected store does not exist';
+    req.session.store = req.body.store;
+    return res.send({ success: 'Your current store has been changed' });
+  } catch(err) {
+    return res.send({ error: String(err) });
   }
 });
 
@@ -122,6 +137,7 @@ async function login(employeenumber, pinnumber) {
       name: employee.name,
       number: employee.number,
       store: employee.store,
+      multistore: employee.multistore,
       admin: employee.admin
     };
   } catch(err) {
@@ -144,9 +160,9 @@ app.post('/login', (req, res) => {
       // Set the server side session
       req.session.employeename = response.name;
       req.session.employeenumber = response.number;
-      req.session.admin = response.admin;
       req.session.store = response.store;
-      req.session.currentstore = response.store === 'all' ? '164' : response.store;
+      req.session.multistore = response.multistore;
+      req.session.admin = response.admin;
     }
     res.send(response);
   });

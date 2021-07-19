@@ -22,6 +22,7 @@ import UserSettings from './usersettings.jsx';
 // Admin
 import Admin from './admin/admin.jsx';
 import AdminUserManage from './admin/usermanage.jsx';
+import AdminStoreManage from './admin/storemanage.jsx';
 
 // The main App component
 class App extends Component {
@@ -55,16 +56,22 @@ class App extends Component {
       // Set the global variables
       window.employeenumber = account.employeenumber;
       window.employeename = account.employeename;
+      window.multistore = account.multistore;
+      window.store = account.store;
       window.isadmin = account.admin;
     } catch(err) {
       // Set the global variables
       window.employeenumber = null;
       window.employeename = null;
+      window.multistore = null;
+      window.store = null;
       window.isadmin = false;
     }
     this.setState({
       employeenumber: window.employeenumber,
       employeename: window.employeename,
+      multistore: window.multistore,
+      store: window.store,
       isadmin: window.isadmin
     });
   }
@@ -86,14 +93,17 @@ class App extends Component {
   render() {
     return (
       <Router>
-        <Navbar/>
-        <div className="container pt-3" style={{ 'marginTop': '61px' }}>
+        <Navbar storenumber={this.state.store} multistore={this.state.multistore}/>
+        <div className="container py-3" style={{ 'marginTop': '61px' }}>
           { this.state.loaded && this.state.employeenumber == null ? <Login/> : <>
             <Switch>
               <Route path="/" exact component={Home}/>
               <Route path="/saletracker" exact component={SaleUnitTracker}/>
+
               <Route path="/admin" exact component={Admin}/>
               <Route path="/admin/usermanage" exact component={AdminUserManage}/>
+              <Route path="/admin/storemanage" exact component={AdminStoreManage}/>
+
               <Route path="/user" exact component={UserSettings}/>
             </Switch>
           </> }

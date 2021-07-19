@@ -12,6 +12,7 @@ import Modal from 'react-bootstrap/Modal';
 import Button from 'react-bootstrap/Button';
 import Alert from 'react-bootstrap/Alert';
 import ButtonGroup from 'react-bootstrap/ButtonGroup';
+import SavingModal from './components/savingmodal.jsx';
 
 export default class SaleUnitTracker extends React.Component {
   constructor(props) {
@@ -281,9 +282,9 @@ export default class SaleUnitTracker extends React.Component {
         {this.state.error ? <Alert variant="danger" onClose={() => { this.setState({ error: null }) }} dismissible>{this.state.error}</Alert> : null}
         {this.state.success ? <Alert variant="success" onClose={() => { this.setState({ success: null }) }} dismissible>{this.state.success}</Alert> : null}
         <ButtonGroup>
-          <Button variant="info" onClick={this.openEditGoals}>Set Goals</Button>
-          <Button variant="warning" onClick={this.openReport}>EOD Report</Button>
-          <Button variant="success" onClick={this.openNewSale}>New Sale</Button>
+          <Button variant="info" className="mr-2" onClick={this.openEditGoals}>Set Goals</Button>
+          <Button variant="warning" className="mr-2" onClick={this.openReport}>EOD Report</Button>
+          <Button variant="success" className="mr-2" onClick={this.openNewSale}>New Sale</Button>
         </ButtonGroup>
         <div className="mt-1 mb-3">
           {/*<div className="d-flex flex-direction-row">
@@ -383,14 +384,7 @@ export default class SaleUnitTracker extends React.Component {
           </table>
         </div>
 
-        <Modal show={this.state.saving} size="sm" onHide={() => { return }}>
-          <Modal.Body className="bg-warning">
-            <div className="d-flex flex-direction-column align-items-center justify-content-middle">
-              <div className="lds-roller mx-auto"><div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div></div>
-            </div>
-            <h5 className="text-center text-white mb-0 mt-3 d-block">Saving Changes</h5>
-          </Modal.Body>
-        </Modal>
+        <SavingModal show={this.state.saving}/>
 
         <Modal show={this.state.newsale !== null && !this.state.saving} onHide={this.closeNewSale}>
           <Modal.Header closeButton>

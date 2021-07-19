@@ -73,7 +73,7 @@ export default class Home extends React.Component {
                   </div>
                   <div className="pl-md-3 text-dark text-center text-md-left">
                     <h5>System Admin</h5>
-                    <p className="m-0 d-none d-md-block">Manage 164 Toolbox application server settings. <span className="text-warning">Requires admin privileges.</span></p>
+                    <p className="m-0 d-none d-md-block">Manage system settings. <span className="text-warning">Requires admin privileges.</span></p>
                   </div>
                 </div>
               </Link>
