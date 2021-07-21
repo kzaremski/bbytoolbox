@@ -32,7 +32,10 @@ router.post('/submitsale', async (req, res) => {
       if (allowedunits.includes(unit) && typeof req.body.sale[unit] === 'number') units[unit] = req.body.sale[unit];
     }
     // Set the employee object
-    const employee = {
+    const employee = req.body.otheremployee ? {
+      name: 'Other',
+      number: 0,
+    } : {
       number: req.session.employeenumber,
       name: req.session.employeename
     };
@@ -129,12 +132,13 @@ router.post('/getsales', async (req, res) => {
     // Find all matching documents using a MongoDB aggregation pipeline
     let sales = await ComputingSale.aggregate([{
       "$match": {
-        "date": { "$gte": begin, "$lt": end }
-      },
-      "$match": {
-        "store": req.session.store
+        "date": { "$gte": begin, "$lt": end },
       }
     }]);
+    // Filter out manually by store
+    sales.filter((sale) => {
+      return sale.store === req.session.store
+    });
     // Find today's sales goals
     let goals = await ComputingSaleGoal.findOne({ store: req.session.store, date: utcToZonedTime(new Date().toISOString(), 'America/Denver').toISOString().split('T')[0] });
     if (goals) goals = goals.units; 

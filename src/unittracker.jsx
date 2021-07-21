@@ -27,6 +27,7 @@ export default class SaleUnitTracker extends React.Component {
       success: null,
       employeenumber: '',
       employeename: '',
+      otheremployee: false,
       newsale: null,
       prevgoals: null,
       goals: {
@@ -65,6 +66,8 @@ export default class SaleUnitTracker extends React.Component {
     // End of Day Report
     this.openReport = this.openReport.bind(this);
     this.closeReport = this.closeReport.bind(this);
+
+    this.toggleOption = this.toggleOption.bind(this);
   }
 
   // Update current sales
@@ -133,7 +136,7 @@ export default class SaleUnitTracker extends React.Component {
 
   // Close the new sale modal, open the new sale modal
   closeNewSale() { this.setState({ newsale: null }) }
-  openNewSale() { this.setState({ newsale: JSON.parse(JSON.stringify(this.blanknewsale)) }) }
+  openNewSale() { this.setState({ newsale: JSON.parse(JSON.stringify(this.blanknewsale)), otheremployee: false }) }
 
   // Increment and decrement unit counts for the new sale dialog
   incrementUnit(event) {
@@ -163,6 +166,7 @@ export default class SaleUnitTracker extends React.Component {
           credentials: 'same-origin',
           body: JSON.stringify({
             sale: this.state.newsale,
+            otheremployee: this.state.otheremployee,
             timezone: Intl.DateTimeFormat().resolvedOptions().timeZone
           }),
           headers: {
@@ -233,6 +237,14 @@ export default class SaleUnitTracker extends React.Component {
   // Open and close the report window
   closeReport() { this.setState({ reportopen: false }) }
   openReport() { this.setState({ reportopen: true }) }
+
+  // Toggle an option
+  toggleOption(event) {
+    const option = event.currentTarget.name;
+    this.setState({
+      [option]: this.state[option] ? false : true
+    });
+  }
 
   render() {
     // Add all units from individual sales into unified counts
@@ -384,7 +396,7 @@ export default class SaleUnitTracker extends React.Component {
           </table>
         </div>
 
-        <SavingModal show={this.state.saving}/>
+        <SavingModal show={this.state.saving} />
 
         <Modal show={this.state.newsale !== null && !this.state.saving} onHide={this.closeNewSale}>
           <Modal.Header closeButton>
@@ -434,6 +446,14 @@ export default class SaleUnitTracker extends React.Component {
                   <Button variant="danger" className="col-4 px-0 text-center" block disabled={this.state.newsale.bp < 1} onClick={this.decrementUnit} name="bp"><strong>-</strong></Button>
                   <h5 className="mt-2 col-4 p-0 text-center">{this.state.newsale.bp}</h5>
                   <Button variant="success" className="col-4 px-0 text-center" block disabled={this.state.newsale.bp >= 3} onClick={this.incrementUnit} name="bp"><strong>+</strong></Button>
+                </div>
+              </div>
+              <p className="small mt-3 mb-0">The following option dictates whether or not this sale was made by an employee from a different department or one that does not have access to the application.</p>
+              <div className="d-flex flex-direction-row">
+                <div className="flex-grow-1 w-75 pt-2">Sale Made By Other Employee</div>
+                <div className="flex-shrink-0 ml-3 w-25">
+                  <Button variant={!this.state.otheremployee ? "danger" : "dark"} className="px-0 text-center w-50" name="otheremployee" onClick={this.toggleOption}><strong>No</strong></Button>
+                  <Button variant={this.state.otheremployee ? "success" : "dark"} className="px-0 text-center w-50" name="otheremployee" onClick={this.toggleOption}><strong>Yes</strong></Button>
                 </div>
               </div>
             </> : null}
