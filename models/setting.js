@@ -8,7 +8,7 @@ const Schema = mongoose.Schema;
 
 let SettingSchema = new Schema({
   name: String,
-  value: Mixed
+  value: Schema.Types.Mixed
 });
 
 module.exports = mongoose.model('settings', SettingSchema);
