@@ -47,6 +47,7 @@ export default class Admin extends React.Component {
             <div className="row">
               <div className="col-sm-6"><Link to="/admin/usermanage" className="text-decoration-none"><button className="btn btn-block btn-primary mb-3">User Management</button></Link></div>
               <div className="col-sm-6"><Link to="/admin/storemanage" className="text-decoration-none"><button className="btn btn-block btn-primary mb-3">Store Management</button></Link></div>
+              <div className="col-sm-6"><Link to="/admin/motd" className="text-decoration-none"><button className="btn btn-block btn-primary mb-3">Message of the Day</button></Link></div>
               <div className="col-sm-6"><Link to="/admin/computingsales" className="text-decoration-none"><button className="btn btn-block btn-primary mb-3" disabled>Computing Sale Data Management</button></Link></div>
               <div className="col-sm-6"><Link to="/admin/accesslogs" className="text-decoration-none"><button className="btn btn-block btn-primary mb-3" disabled>Access Logs</button></Link></div>
             </div>

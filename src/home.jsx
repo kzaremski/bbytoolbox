@@ -1,5 +1,5 @@
 /**
- * 164 Toolbox / Home Screen
+ * BBY Toolbox / Home Screen
  * 
  * Konstantin Zaremski
  * -- June 14, 2021
@@ -9,6 +9,8 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 
+import Alert from 'react-bootstrap/Alert';
+
 export default class Home extends React.Component {
   constructor(props) {
     super(props);
@@ -16,8 +18,11 @@ export default class Home extends React.Component {
     this.state = {
       employeenumber: '',
       employeename: '',
-      isadmin: false
+      isadmin: false,
+      motd: null
     }
+
+    this.getMOTD = this.getMOTD.bind(this);
   }
 
   async logout() {
@@ -33,12 +38,36 @@ export default class Home extends React.Component {
     if (logout.success) window.checkLoginStatus();
   }
 
+  async getMOTD() {
+    let data = {};
+
+    try {
+      let response = await fetch('/motd/get', {
+        method: 'POST',
+        mode: 'same-origin',
+        cache: 'no-cache',
+        credentials: 'same-origin',
+        headers: {
+          'Content-Type': 'application/json'
+        }
+      }).then(response => response.json());
+      data = response;
+    } catch (err) {
+      console.log(err);
+      data = { error: 'There was an error parsing the response from the backend. Possible errors: 404, 500.' };
+    }
+
+    if (data.error) return this.setState({ ...data });
+    this.setState({ motd: data });
+  }
+
   componentDidMount() {
     this.setState({
       employeenumber: window.employeenumber,
       employeename: window.employeename,
       isadmin: window.isadmin
     });
+    this.getMOTD();
   }
 
   render() {
@@ -52,6 +81,7 @@ export default class Home extends React.Component {
           <div className="mt-2">Welcome, <strong>{FirstNameL}</strong>.</div>
           <div className="ml-auto"><button className="btn btn-danger" onClick={this.logout}>Logout</button></div>
         </div>
+        {(this.state.motd && this.state.motd.enabled) ? <Alert variant={this.state.motd.type}>{this.state.motd.content}</Alert> : null }
         <Link to="/saletracker">
           <div className="d-flex border p-3 mb-3">
             <div>
@@ -102,7 +132,7 @@ export default class Home extends React.Component {
               <p className="m-0">Change your PIN number and other settings.</p>
             </div>
           </div>
-        </Link> }
+        </Link>}
       </>
     );
   }

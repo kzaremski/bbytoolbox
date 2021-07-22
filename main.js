@@ -20,7 +20,7 @@ const helmet = require('helmet');
 const app = express();
 
 // Load environment configuration variables from a file if in development mode
-if (app.get('env') != 'production') require('dotenv').config({ path: path.join(__dirname, 'dev.env')});
+if (app.get('env') != 'production') require('dotenv').config({ path: path.join(__dirname, 'dev.env') });
 
 // Configure nunjucks
 nunjucks.configure('views', {
@@ -63,7 +63,7 @@ app.use('/build', express.static(path.join(__dirname, 'build')));
 
 // Connect to the MongoDB database
 mongoose.connect(process.env.MONGODB_URI, {
-  useNewUrlParser: true, 
+  useNewUrlParser: true,
   useUnifiedTopology: true,
   useFindAndModify: false
 }, (err) => {
@@ -77,6 +77,7 @@ const Employee = require(path.join(__dirname, 'models/employee'));
 const Store = require(path.join(__dirname, 'models/store'));
 const IPAddress = require(path.join(__dirname, 'models/ipaddress'));
 const Login = require(path.join(__dirname, 'models/login'));
+const Setting = require(path.join(__dirname, 'models/setting'));
 
 // All regular HTTP requests are delivered the main view
 app.get('*', (req, res) => { res.sendFile(path.join(__dirname, '/index.html')) });
@@ -85,6 +86,7 @@ app.get('*', (req, res) => { res.sendFile(path.join(__dirname, '/index.html')) }
 app.use('/saletracker', require('./saletracker.js'));
 app.use('/user', require('./user.js'));
 app.use('/admin', require('./admin.js'));
+app.use('/motd', require('./motd.js'));
 
 // Get current account status
 app.post('/currentuser', async (req, res) => {
@@ -103,7 +105,7 @@ app.post('/getstores', async (req, res) => {
     if (!req.session.employeenumber) throw 'You need to be logged in to access this information';
     let stores = await Store.find();
     return res.send({ stores: stores });
-  } catch(err) {
+  } catch (err) {
     return res.send({ error: String(err) });
   }
 });
@@ -118,7 +120,7 @@ app.post('/changestore', async (req, res) => {
     if (!store) throw 'The selected store does not exist';
     req.session.store = req.body.store;
     return res.send({ success: 'Your current store has been changed' });
-  } catch(err) {
+  } catch (err) {
     return res.send({ error: String(err) });
   }
 });
@@ -140,7 +142,7 @@ async function login(employeenumber, pinnumber) {
       multistore: employee.multistore,
       admin: employee.admin
     };
-  } catch(err) {
+  } catch (err) {
     return { error: String(err) };
   }
 }
@@ -174,4 +176,20 @@ app.post('/logout', (req, res) => {
 })
 
 // Listen to HTTP requests
-app.listen((process.env.PORT || 3000), () => { console.log(`Express app listening at http://127.0.0.1:${(process.env.PORT || 3000)}`); });
+app.listen((process.env.PORT || 3000), async () => {
+  console.log(`Express app listening at http://127.0.0.1:${(process.env.PORT || 3000)}`);
+  // Set default settings if they are not set
+  try {
+    // MOTD Enabled (to show or not)
+    let settings = await Setting.find({ name: 'motd_enabled' });
+    if (settings.length === 0) await new Setting({ name: 'motd_enabled', value: false }).save();
+    // MOTD Content
+    settings = await Setting.find({ name: 'motd_content' });
+    if (settings.length === 0) await new Setting({ name: 'motd_content', value: '' }).save();
+    // MOTD Type
+    settings = await Setting.find({ name: 'motd_type' });
+    if (settings.length === 0) await new Setting({ name: 'motd_type', value: 'primary' }).save();
+  } catch (err) {
+    console.log('Error: ' + err);
+  }
+});
