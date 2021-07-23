@@ -87,6 +87,7 @@ app.use('/saletracker', require('./saletracker.js'));
 app.use('/user', require('./user.js'));
 app.use('/admin', require('./admin.js'));
 app.use('/motd', require('./motd.js'));
+app.use('/report', require('./report.js'));
 
 // Get current account status
 app.post('/currentuser', async (req, res) => {
