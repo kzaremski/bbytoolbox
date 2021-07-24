@@ -24,6 +24,7 @@ import Admin from './admin/admin.jsx';
 import AdminUserManage from './admin/usermanage.jsx';
 import AdminStoreManage from './admin/storemanage.jsx';
 import AdminMOTDManage from './admin/motd.jsx';
+import AdminReportManage from './admin/reportmanage.jsx';
 
 // The main App component
 class App extends Component {
@@ -104,6 +105,7 @@ class App extends Component {
               <Route path="/admin" exact component={Admin}/>
               <Route path="/admin/usermanage" exact component={AdminUserManage}/>
               <Route path="/admin/storemanage" exact component={AdminStoreManage}/>
+              <Route path="/admin/reports" exact component={AdminReportManage}/>
               <Route path="/admin/motd" exact component={AdminMOTDManage}/>
 
               <Route path="/user" exact component={UserSettings}/>
