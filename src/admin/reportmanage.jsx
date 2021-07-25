@@ -28,12 +28,14 @@ export default class AdminReportManage extends React.Component {
 
       email: '',
 
-      autoreportenabled: false,
-      emailsendenabled: false,
-      reportrecipients: []
+      autoenabled: false,
+      emailenabled: false,
+      emailrecipients: []
     };
 
     // Bind this to component methods
+    this.getSettings = this.getSettings.bind(this);
+    this.setSettings = this.setSettings.bind(this);
 
     this.addRecipient = this.addRecipient.bind(this);
     this.delRecipient = this.delRecipient.bind(this);
@@ -43,8 +45,69 @@ export default class AdminReportManage extends React.Component {
     this.handleKeyDown = this.handleKeyDown.bind(this);
   }
 
+  getSettings() {
+    this.setState({ loading: true, error: null }, async () => {
+      let data = {};
+
+      try {
+        // Load data
+        let response = await fetch('/report/getsettings', {
+          method: 'POST',
+          mode: 'same-origin',
+          cache: 'no-cache',
+          credentials: 'same-origin',
+          headers: {
+            'Content-Type': 'application/json'
+          }
+        }).then(response => response.json());
+        data = response;
+      } catch (err) {
+        console.log(err);
+        data = { error: 'There was an error parsing the response from the backend. Possible errors: 404, 500.' };
+      }
+
+      this.setState({
+        ...data,
+        success: null,
+        loading: false
+      });
+    });
+  }
+
+  setSettings() {
+    this.setState({ saving: true, error: null, success: null }, async () => {
+      let data = {};
+      try {
+        // Load data
+        let response = await fetch('/report/setsettings', {
+          method: 'POST',
+          mode: 'same-origin',
+          cache: 'no-cache',
+          credentials: 'same-origin',
+          body: JSON.stringify({
+            autoenabled: this.state.autoenabled,
+            emailenabled: this.state.emailenabled,
+            emailrecipients: this.state.emailrecipients
+          }),
+          headers: {
+            'Content-Type': 'application/json'
+          }
+        }).then(response => response.json());
+        data = response;
+      } catch (err) {
+        console.log(err);
+        data = { error: 'There was an error parsing the response from the backend. Possible errors: 404, 500.' };
+      }
+
+      this.setState({
+        ...data,
+        saving: false
+      });
+    });
+  }
+
   componentDidMount() {
-    
+    this.getSettings();
   }
 
   // Add a recipient to the list of recipients
@@ -54,20 +117,20 @@ export default class AdminReportManage extends React.Component {
       if (email.split('@').length != 2
         || email.split('@')[0].length < 1
         || email.split('@')[1].split('.').length != 2) return this.setState({ error: 'The email that you have entered is invalid' });
-      if (this.state.reportrecipients.indexOf(email) >= 0) return this.setState({ error: 'That email is already in the list', email: '' });
-      let recipients = this.state.reportrecipients.slice();
+      if (this.state.emailrecipients.indexOf(email) >= 0) return this.setState({ error: 'That email is already in the list', email: '' });
+      let recipients = this.state.emailrecipients.slice();
       recipients.push(email);
-      this.setState({ reportrecipients: recipients, email: '' });
+      this.setState({ emailrecipients: recipients, email: '' });
     });
   }
 
   // Remove an email from the list
   delRecipient(event) {
     const email = event.currentTarget.name;
-    let recipients = this.state.reportrecipients.slice();
+    let recipients = this.state.emailrecipients.slice();
     const index = recipients.indexOf(email);
     if (index > -1) recipients.splice(index, 1);
-    this.setState({ reportrecipients: recipients, status: `Removed "${email}" from the list` });
+    this.setState({ emailrecipients: recipients, status: `Removed "${email}" from the list` });
   }
 
   // Toggle an option
@@ -108,8 +171,8 @@ export default class AdminReportManage extends React.Component {
         </ol>
         <div className="d-flex flex-direction-row align-items-start mb-2">
           <h5 className="mt-1"><strong>Reporting</strong></h5>
-          <Button variant="danger" className="ml-auto mr-3" onClick={this.getReportSettings}><FontAwesomeIcon icon={faTrash} className="mr-2" />Discard Changes</Button>
-          <Button variant="success" onClick={this.saveReportSettings}><FontAwesomeIcon icon={faSave} className="mr-2" />Save</Button>
+          <Button variant="danger" className="ml-auto mr-3" onClick={this.getSettings}><FontAwesomeIcon icon={faTrash} className="mr-2" />Discard Changes</Button>
+          <Button variant="success" onClick={this.setSettings}><FontAwesomeIcon icon={faSave} className="mr-2" />Save</Button>
         </div>
 
         {this.state.loading ? <Alert variant="warning">Loading the current settings</Alert> : null}
@@ -122,8 +185,8 @@ export default class AdminReportManage extends React.Component {
           <label htmlFor="content" className="col-sm-4 mt-1">Enable automatic reporting?</label>
           <div className="col-sm-8 d-flex">
             <div className="flex-grow-0 d-flex flex-direction-row">
-              <Button variant={!this.state.autoreportenabled ? "danger" : "dark"} className="w-50 text-center" name="autoreportenabled" onClick={this.toggleOption} disabled={this.state.loading}><strong>No</strong></Button>
-              <Button variant={this.state.autoreportenabled ? "success" : "dark"} className="w-50 text-center" name="autoreportenabled" onClick={this.toggleOption} disabled={this.state.loading}><strong>Yes</strong></Button>
+              <Button variant={!this.state.autoenabled ? "danger" : "dark"} className="w-50 text-center" name="autoenabled" onClick={this.toggleOption} disabled={this.state.loading}><strong>No</strong></Button>
+              <Button variant={this.state.autoenabled ? "success" : "dark"} className="w-50 text-center" name="autoenabled" onClick={this.toggleOption} disabled={this.state.loading}><strong>Yes</strong></Button>
             </div>
           </div>
         </div>
@@ -131,8 +194,8 @@ export default class AdminReportManage extends React.Component {
           <label htmlFor="content" className="col-sm-4 mt-1">Enable email notifications?</label>
           <div className="col-sm-8 d-flex">
             <div className="flex-grow-0 d-flex flex-direction-row">
-              <Button variant={!this.state.emailsendenabled ? "danger" : "dark"} className="w-50 text-center" name="emailsendenabled" onClick={this.toggleOption} disabled={this.state.loading}><strong>No</strong></Button>
-              <Button variant={this.state.emailsendenabled ? "success" : "dark"} className="w-50 text-center" name="emailsendenabled" onClick={this.toggleOption} disabled={this.state.loading}><strong>Yes</strong></Button>
+              <Button variant={!this.state.emailenabled ? "danger" : "dark"} className="w-50 text-center" name="emailenabled" onClick={this.toggleOption} disabled={this.state.loading}><strong>No</strong></Button>
+              <Button variant={this.state.emailenabled ? "success" : "dark"} className="w-50 text-center" name="emailenabled" onClick={this.toggleOption} disabled={this.state.loading}><strong>Yes</strong></Button>
             </div>
           </div>
         </div>
@@ -143,8 +206,8 @@ export default class AdminReportManage extends React.Component {
           </div>
           <Button variant="primary" disabled={this.state.email.length === 0} onClick={this.addRecipient}><FontAwesomeIcon icon={faPlus} /></Button>
         </div>
-        {this.state.reportrecipients.length > 0 ?
-          this.state.reportrecipients.map((email) =>
+        {this.state.emailrecipients.length > 0 ?
+          this.state.emailrecipients.map((email) =>
             <div className="d-flex flex-direction-row mb-3" key={email}>
               <div className="mr-3 flex-grow-1">
                 <label className="mt-1">{email}</label>

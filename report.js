@@ -73,7 +73,16 @@ router.post('/getsettings', async (req, res) => {
     // Authenticate user
     if (!req.session.employeenumber) throw 'Session expired, you are not authenticated';
     if (!req.session.admin) throw 'You must have admin priveleges to view report settings';
-    
+    // Build response object from different settings
+    const autoenabled = await Setting.findOne({ name: 'automatic_reporting_enabled' });
+    const emailenabled = await Setting.findOne({ name: 'report_email_sending_enabled' });
+    const emailrecipients = await Setting.findOne({ name: 'report_email_recipients' });
+    const response = {
+      autoenabled: autoenabled.value,
+      emailenabled: emailenabled.value,
+      emailrecipients: emailrecipients.value
+    }
+    // Send back the current settings
     return res.send(response);
   } catch (err) {
     // Send back an error if there is any
@@ -86,9 +95,17 @@ router.post('/setsettings', async (req, res) => {
   try {
     // Authenticate user
     if (!req.session.employeenumber) throw 'Session expired, you are not authenticated';
-    if (!req.session.admin) throw 'You must have admin priveleges to modify report settings';
-    
-    return res.send(response);
+    if (!req.session.admin) throw 'You must have admin priveleges to view reports';
+    // Validate
+    if (!req.body.hasOwnProperty('autoenabled') || typeof req.body.autoenabled != 'boolean') throw 'Submitted settings do not conform to type standards';
+    if (!req.body.hasOwnProperty('emailenabled') || typeof req.body.emailenabled != 'boolean') throw 'Submitted settings do not conform to type standards';
+    if (!req.body.hasOwnProperty('emailrecipients') || !Array.isArray(req.body.emailrecipients)) throw 'Submitted settings do not conform to type standards';
+    // Save the settings
+    await Setting.findOneAndUpdate({ name: 'automatic_reporting_enabled' }, { value: req.body.autoenabled });
+    await Setting.findOneAndUpdate({ name: 'report_email_sending_enabled' }, { value: req.body.emailenabled });
+    await Setting.findOneAndUpdate({ name: 'report_email_recipients' }, { value: req.body.emailrecipients });
+    // Notify the user
+    return res.send({ success: 'The reporting settings have been updated' });
   } catch (err) {
     // Send back an error if there is any
     return res.send({ error: String(err) });

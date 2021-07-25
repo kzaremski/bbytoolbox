@@ -190,6 +190,15 @@ app.listen((process.env.PORT || 3000), async () => {
     // MOTD Type
     settings = await Setting.find({ name: 'motd_type' });
     if (settings.length === 0) await new Setting({ name: 'motd_type', value: 'primary' }).save();
+    // Automatic Reporting Enabled?
+    settings = await Setting.find({ name: 'automatic_reporting_enabled' });
+    if (settings.length === 0) await new Setting({ name: 'automatic_reporting_enabled', value: false }).save();
+    // Send reports by email?
+    settings = await Setting.find({ name: 'report_email_sending_enabled' });
+    if (settings.length === 0) await new Setting({ name: 'report_email_sending_enabled', value: false }).save();
+    // Report Email Recipients
+    settings = await Setting.find({ name: 'report_email_recipients' });
+    if (settings.length === 0) await new Setting({ name: 'report_email_recipients', value: [] }).save();
   } catch (err) {
     console.log('Error: ' + err);
   }
