@@ -67,5 +67,33 @@ router.post('/get', async (req, res) => {
   }
 });
 
+// Get a specific report
+router.post('/getsettings', async (req, res) => {
+  try {
+    // Authenticate user
+    if (!req.session.employeenumber) throw 'Session expired, you are not authenticated';
+    if (!req.session.admin) throw 'You must have admin priveleges to view report settings';
+    
+    return res.send(response);
+  } catch (err) {
+    // Send back an error if there is any
+    return res.send({ error: String(err) });
+  }
+});
+
+// Get a specific report
+router.post('/setsettings', async (req, res) => {
+  try {
+    // Authenticate user
+    if (!req.session.employeenumber) throw 'Session expired, you are not authenticated';
+    if (!req.session.admin) throw 'You must have admin priveleges to modify report settings';
+    
+    return res.send(response);
+  } catch (err) {
+    // Send back an error if there is any
+    return res.send({ error: String(err) });
+  }
+});
+
 // Exporting the router to be used elsewhere
 module.exports = router;
