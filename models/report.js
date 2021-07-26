@@ -8,10 +8,10 @@ const Schema = mongoose.Schema;
 
 let ReportSchema = new Schema({
   guid: String,
-  date: String,
-  type: String,
+  date: Date,
+  filename: String,
   format: String,
-  file: Buffer,
+  data: String,
 });
 
 module.exports = mongoose.model('reports', ReportSchema);

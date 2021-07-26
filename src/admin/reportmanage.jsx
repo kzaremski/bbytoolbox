@@ -161,6 +161,44 @@ export default class AdminReportManage extends React.Component {
     }
   }
 
+  // View most recent report
+  dlMostRecent() {
+    this.setState({ loadingreport: true, error: null }, async () => {
+      let data = {};
+
+      try {
+        // Load data
+        let response = await fetch('/report/get', {
+          method: 'POST',
+          mode: 'same-origin',
+          cache: 'no-cache',
+          credentials: 'same-origin',
+          headers: {
+            'Content-Type': 'application/json'
+          }
+        }).then(response => response.json());
+        data = response;
+      } catch (err) {
+        console.log(err);
+        data = { error: 'There was an error parsing the response from the backend. Possible errors: 404, 500.' };
+      }
+
+      this.setState({
+        loadingreport: false
+      }, () => {
+        if (data.error) this.setState({ ...data });
+        // Download the file
+        const filename = data.filename;
+        const source = `data:${data.format};base64,${data.data}`;
+        const link = document.createElement('a');
+        link.href = source;
+        link.download = filename;
+        link.click();
+        link.remove();
+      });
+    });
+  }
+
   render() {
     return (
       <>
@@ -215,7 +253,9 @@ export default class AdminReportManage extends React.Component {
               <Button variant="danger" onClick={this.delRecipient} name={email}><FontAwesomeIcon icon={faTimes} /></Button>
             </div>
           )
-        : <p className="ml-5 small">No email addresses are set to receive the daily reports.</p>}
+          : <p className="ml-5 small">No email addresses are set to receive the daily reports.</p>}
+
+
       </>
     );
   }
