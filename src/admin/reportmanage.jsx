@@ -13,7 +13,7 @@ import Alert from 'react-bootstrap/Alert';
 
 // Font awesome
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faSave, faTrash, faPlus, faTimes } from '@fortawesome/free-solid-svg-icons';
+import { faSave, faTrash, faPlus, faTimes, faEye } from '@fortawesome/free-solid-svg-icons';
 
 export default class AdminReportManage extends React.Component {
   constructor(props) {
@@ -43,6 +43,8 @@ export default class AdminReportManage extends React.Component {
     this.toggleOption = this.toggleOption.bind(this);
     this.handleChange = this.handleChange.bind(this);
     this.handleKeyDown = this.handleKeyDown.bind(this);
+
+    this.dlMostRecent = this.dlMostRecent.bind(this);
   }
 
   getSettings() {
@@ -210,9 +212,11 @@ export default class AdminReportManage extends React.Component {
         <div className="d-flex flex-direction-row align-items-start mb-2">
           <h5 className="mt-1"><strong>Reporting</strong></h5>
           <Button variant="danger" className="ml-auto mr-3" onClick={this.getSettings}><FontAwesomeIcon icon={faTrash} className="mr-2" />Discard Changes</Button>
+          <Button variant="primary" className="mr-3" onClick={this.dlMostRecent}><FontAwesomeIcon icon={faEye} className="mr-2" />View Last Report</Button>
           <Button variant="success" onClick={this.setSettings}><FontAwesomeIcon icon={faSave} className="mr-2" />Save</Button>
         </div>
 
+        {this.state.loadingreport ? <Alert variant="warning">Please wait while the latest report is loaded</Alert> : null}
         {this.state.loading ? <Alert variant="warning">Loading the current settings</Alert> : null}
         {this.state.saving ? <Alert variant="warning">Updating the report settings</Alert> : null}
         {this.state.status ? <Alert variant="primary" onClose={() => { this.setState({ status: null }) }} dismissible>{this.state.status}</Alert> : null}
@@ -254,8 +258,6 @@ export default class AdminReportManage extends React.Component {
             </div>
           )
           : <p className="ml-5 small">No email addresses are set to receive the daily reports.</p>}
-
-
       </>
     );
   }

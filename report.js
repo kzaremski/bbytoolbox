@@ -149,7 +149,8 @@ async function runDailyReport() {
     const buffer = await workbook.writeToBuffer();
     const data = buffer.toString('base64');
 
-    const yesterday = subDays(new Date(), 1);
+    const now = utcToZonedTime(new Date().toISOString(), store.timezone);
+    const yesterday = subDays(now, 1);
 
     // Save the data to the database
     await new Report({
@@ -192,7 +193,7 @@ router.post('/get', async (req, res) => {
     // Authenticate user
     if (!req.session.employeenumber) throw 'Session expired, you are not authenticated';
     if (!req.session.admin) throw 'You must have admin priveleges to view reports';
-    const latest = await Report.find().sort([['date', 'descending']]).all();
+    const latest = await Report.find().sort({ _id: -1 }).limit(1);
     return res.send(latest.length > 0 ? latest[0] : { error: 'There are no reports' });
   } catch (err) {
     // Send back an error if there is any
