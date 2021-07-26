@@ -33,6 +33,16 @@ function guidGenerator() {
   return (S4() + S4() + '-' + S4() + '-' + S4() + '-' + S4() + '-' + S4() + S4() + S4());
 }
 
+// Email a specific report to the recipients
+async function emailReport(reportid) {
+  try {
+    
+  } catch (err) {
+    return console.log('There was an error emailing the report:\n' + String(err));
+  }
+}
+
+// Generate a daily report for the previous day and save it in the database
 async function runDailyReport() {
   try {
     const reportid = guidGenerator();
@@ -160,6 +170,12 @@ async function runDailyReport() {
       format: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
       data: data
     }).save();
+
+    // Notify complete
+    console.log('  Finished daily report @ ' + new Date().toISOString());
+
+    // Move on to email report
+    emailReport(reportid);
   } catch (err) {
     return console.log('There was an error running the daily report:\n' + String(err));
   }
