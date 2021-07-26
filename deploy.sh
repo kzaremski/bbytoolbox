@@ -22,15 +22,16 @@ echo "  New working directory: '/tmp'."
 
 # Download the latest snapshot of the master branch
 echo "  Downloading latest production package from GitHub."
-wget https://github.com/kzaremski/bbytoolbox/archive/refs/heads/main.zip -O main.zip
+rm -rf bbytoolbox
+git clone git@github.com:kzaremski/bbytoolbox.git
 
 # Unzip the file
-echo "  Extracting package."
-unzip -qq -o main.zip
+#echo "  Extracting package."
+#unzip -qq -o main.zip
 
 # Go into the extracted package
-cd bbytoolbox-main
-echo "  New working directory: /tmp/bbytoolbox-main"
+cd bbytoolbox
+echo "  New working directory: /tmp/bbytoolbox"
 
 # Install the node-js modules
 echo "  Installing node modules."
@@ -50,7 +51,7 @@ sudo rm -rf *
 
 # Copy new files
 echo "  Installing package."
-sudo cp -r /tmp/bbytoolbox-main/* ./
+sudo cp -r /tmp/bbytoolbox/* ./
 
 # Copy the systemd unit file
 echo "  Registering systemd unit file."
