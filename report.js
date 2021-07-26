@@ -159,7 +159,7 @@ async function runDailyReport() {
     const buffer = await workbook.writeToBuffer();
     const data = buffer.toString('base64');
 
-    const now = utcToZonedTime(new Date().toISOString(), store.timezone);
+    const now = utcToZonedTime(new Date().toISOString(), 'America/Denver');
     const yesterday = subDays(now, 1);
 
     // Save the data to the database
