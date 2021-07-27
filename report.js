@@ -14,6 +14,7 @@ const subDays = require('date-fns/subDays');
 const { zonedTimeToUtc, utcToZonedTime } = require('date-fns-tz');
 const cron = require('node-cron');
 const excel = require('excel4node');
+const nodemailer = require('nodemailer');
 
 const router = require('express').Router();
 
@@ -33,10 +34,60 @@ function guidGenerator() {
   return (S4() + S4() + '-' + S4() + '-' + S4() + '-' + S4() + '-' + S4() + S4() + S4());
 }
 
+// Create email transporter
+let transporter = nodemailer.createTransport({
+  pool: true,
+  host: 'mail.zaremski.net',
+  port: 465,
+  secure: true, // use TLS
+  auth: {
+    user: '',
+    pass: ''
+  }
+});
+
+transporter.verify(function (error, success) {
+  if (error) {
+    console.log('Failed to connect to the mail server');
+    console.log(error);
+  } else {
+    console.log('Mail server connection online');
+  }
+});
+
 // Email a specific report to the recipients
 async function emailReport(reportid) {
   try {
-    
+    // Make sure that the emial report sending option is enabled
+    const report_email_sending_enabled = await Setting.findOne({ name: 'report_email_sending_enabled' });
+    if (!report_email_sending_enabled) return;
+
+    // Get a list of who we are sending the report to
+    const emailrecipients = await Setting.findOne({ name: 'report_email_recipients' });
+    if (emailrecipients.length < 1) return;
+
+    console.log('  Emailing the daily report to recipients...');
+
+    // Get the report
+    const report = Report.findOne({ guid: reportid });
+
+    const message = {
+      from: '"BBY Toolbox Reporting" <noreply.reportingy@zaremski.net>',
+      to: emailrecipients.join(', '),
+      subject: `BBY Toolbox Daily Report (${report.filename})`,
+      text: `Yesterday\'s report finished running at ${report.date.toISOString()}. Open the attached XLSX file to see the numbers.`,
+      attachments: [
+        {
+          filename: report.filename,
+          contentType: report.format,
+          content: report.data,
+          encoding: 'base64'
+        }]
+    };
+    let email = await transporter.sendMail(message);
+
+    // Notify
+    console.log(`  Sent daily report to ${emailrecipients.join(', ')} @ ${new Date().toISOString()}`);
   } catch (err) {
     return console.log('There was an error emailing the report:\n' + String(err));
   }
