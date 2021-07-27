@@ -150,7 +150,7 @@ async function runDailyReport() {
       }]);
 
       // Filter out manually by store
-      sales.filter((sale) => {
+      sales = sales.filter((sale) => {
         return sale.store === store.number
       });
 

@@ -136,8 +136,8 @@ router.post('/getsales', async (req, res) => {
       }
     }]);
     // Filter out manually by store
-    sales.filter((sale) => {
-      return sale.store === req.session.store
+    sales = sales.filter((sale) => {
+      return sale.store === req.session.store;
     });
     // Find today's sales goals
     let goals = await ComputingSaleGoal.findOne({ store: req.session.store, date: utcToZonedTime(new Date().toISOString(), 'America/Denver').toISOString().split('T')[0] });
