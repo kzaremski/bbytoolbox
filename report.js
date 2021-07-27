@@ -14,7 +14,14 @@ const subDays = require('date-fns/subDays');
 const { zonedTimeToUtc, utcToZonedTime } = require('date-fns-tz');
 const cron = require('node-cron');
 const excel = require('excel4node');
-const nodemailer = require('nodemailer');
+
+// Set up mailgun
+const mg_domain = 'mail.zaremski.net';
+const mg_apikey = 'ec83406d9067a3a325eada56b6039bdd-a0cfb957-cc1c2c69';
+const mailgun = require('mailgun-js')({
+  apiKey: mg_apikey,
+  domain: mg_domain
+});
 
 const router = require('express').Router();
 
@@ -33,29 +40,6 @@ function guidGenerator() {
   };
   return (S4() + S4() + '-' + S4() + '-' + S4() + '-' + S4() + '-' + S4() + S4() + S4());
 }
-
-// Create email transporter
-let transporter = nodemailer.createTransport({
-  pool: true,
-  host: 'smtp.mailgun.org',
-  port: 587,
-  auth: {
-    user: 'postmaster@mail.zaremski.net',
-    pass: 'a213df33a31bddb843374a175468598f-a0cfb957-f2e06f66'
-  },
-  tls: {
-      ciphers:'SSLv3'
-  }
-});
-
-transporter.verify(function (error, success) {
-  if (error) {
-    console.log('Failed to connect to the mail server');
-    console.log(error);
-  } else {
-    console.log('Mail server connection online');
-  }
-});
 
 // Email a specific report to the recipients
 async function emailReport(reportid) {
@@ -78,15 +62,13 @@ async function emailReport(reportid) {
       to: emailrecipients.value.join(', '),
       subject: `BBY Toolbox Daily Report (${report.filename})`,
       text: `Yesterday\'s report finished running at ${report.date.toISOString()}. Open the attached XLSX file to see the numbers.\n\n`,
-      attachments: [
-        {
-          filename: report.filename,
-          contentType: report.format,
-          content: report.data,
-          encoding: 'base64'
-        }]
+      attachment: new mailgun.Attachment({
+        data: Buffer.from(report.data, 'base64'),
+        filename: report.filename,
+        contentType: report.format
+      })
     };
-    let email = await transporter.sendMail(message);
+    await mailgun.messages().send(message);
 
     // Notify
     console.log(`  Sent daily report to ${emailrecipients.value.join(', ')} @ ${new Date().toISOString()}`);
