@@ -37,12 +37,14 @@ function guidGenerator() {
 // Create email transporter
 let transporter = nodemailer.createTransport({
   pool: true,
-  host: 'mail.zaremski.net',
-  port: 465,
-  secure: true, // use TLS
+  host: 'smtp.mailgun.org',
+  port: 587,
   auth: {
-    user: '',
-    pass: ''
+    user: 'postmaster@mail.zaremski.net',
+    pass: 'a213df33a31bddb843374a175468598f-a0cfb957-f2e06f66'
+  },
+  tls: {
+      ciphers:'SSLv3'
   }
 });
 
@@ -60,22 +62,22 @@ async function emailReport(reportid) {
   try {
     // Make sure that the emial report sending option is enabled
     const report_email_sending_enabled = await Setting.findOne({ name: 'report_email_sending_enabled' });
-    if (!report_email_sending_enabled) return;
+    if (!report_email_sending_enabled.value) return;
 
     // Get a list of who we are sending the report to
     const emailrecipients = await Setting.findOne({ name: 'report_email_recipients' });
-    if (emailrecipients.length < 1) return;
+    if (emailrecipients.value.length < 1) return;
 
     console.log('  Emailing the daily report to recipients...');
 
     // Get the report
-    const report = Report.findOne({ guid: reportid });
+    const report = await Report.findOne({ guid: reportid });
 
     const message = {
-      from: '"BBY Toolbox Reporting" <noreply.reportingy@zaremski.net>',
-      to: emailrecipients.join(', '),
+      from: '"BBY Toolbox Reporting" <noreply.reporting@zaremski.net>',
+      to: emailrecipients.value.join(', '),
       subject: `BBY Toolbox Daily Report (${report.filename})`,
-      text: `Yesterday\'s report finished running at ${report.date.toISOString()}. Open the attached XLSX file to see the numbers.`,
+      text: `Yesterday\'s report finished running at ${report.date.toISOString()}. Open the attached XLSX file to see the numbers.\n\n`,
       attachments: [
         {
           filename: report.filename,
@@ -87,7 +89,7 @@ async function emailReport(reportid) {
     let email = await transporter.sendMail(message);
 
     // Notify
-    console.log(`  Sent daily report to ${emailrecipients.join(', ')} @ ${new Date().toISOString()}`);
+    console.log(`  Sent daily report to ${emailrecipients.value.join(', ')} @ ${new Date().toISOString()}`);
   } catch (err) {
     return console.log('There was an error emailing the report:\n' + String(err));
   }
@@ -235,7 +237,7 @@ async function runDailyReport() {
 // Run the report every day at 12:00PM UTC (at this time all US time zones are on the same 'next' day)
 cron.schedule('0 12 * * *', async () => {
   const automatic_reporting_enabled = await Setting.findOne({ name: 'automatic_reporting_enabled' });
-  if (!automatic_reporting_enabled) return;
+  if (!automatic_reporting_enabled.value) return;
   console.log('  Scheduled job started! Running daily sales report @ ' + new Date().toISOString());
   runDailyReport();
 });
