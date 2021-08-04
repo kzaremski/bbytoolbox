@@ -119,13 +119,15 @@ async function runDailyReport() {
       worksheet.cell(3, 6).string(`BP`).style(bold);
 
       // Get all goals for that store
+      let dbgoals = await ComputingSaleGoal.findOne({ store: store.number, date: yesterday.toISOString().split('T')[0] });
       let goals = Object.assign({
         oem: 0,
         office: 0,
         surface: 0,
         tts: 0,
         bp: 0
-      }, await ComputingSaleGoal.findOne({ store: store.number, date: yesterday.toISOString().split('T')[0] }));
+      }, dbgoals ? dbgoals.units : {});
+      
       // Find all matching documents using a MongoDB aggregation pipeline
       let sales = await ComputingSale.aggregate([{
         "$match": {
