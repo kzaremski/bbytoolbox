@@ -6,6 +6,7 @@ After=network.target
 [Service]
 WorkingDirectory=/etc/bbytoolbox/
 Environment=PORT=3000
+Environment=PIN=no
 Type=simple
 User=node
 ExecStart=/usr/bin/node /etc/bbytoolbox/main.js

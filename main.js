@@ -22,6 +22,9 @@ const app = express();
 // Load environment configuration variables from a file if in development mode
 if (app.get('env') != 'production') require('dotenv').config({ path: path.join(__dirname, 'dev.env') });
 
+// Determine settings of the application from environment variables
+const PIN_AUTH_ENABLED = process.env.PIN && process.env.PIN.toLowerCase() == 'yes';
+
 // Configure nunjucks
 nunjucks.configure('views', {
   noCache: true,
@@ -40,22 +43,13 @@ app.use(bodyParser.urlencoded({ extended: true }), bodyParser.json());
 app.set('trust proxy', true);
 
 // Configure server side sessions
-if (app.get('env') === 'production') {
-  app.set('trust proxy', 1);
-  app.use(session({
-    secret: 'A' + Math.random(),
-    expires: new Date(Date.now() + (12 * 60 * 60 * 1000)),
-    resave: false,
-    saveUninitialized: true,
-  }));
-} else {
-  app.use(session({
-    secret: 'A' + Math.random(),
-    expires: new Date(Date.now() + (12 * 60 * 60 * 1000)),
-    resave: false,
-    saveUninitialized: true
-  }));
-}
+if (app.get('env') === 'production') app.set('trust proxy', 1);
+app.use(session({
+  secret: 'A' + Math.random(),
+  expires: new Date(Date.now() + (12 * 60 * 60 * 1000)),
+  resave: false,
+  saveUninitialized: true
+}));
 
 // Static assets and files
 app.use('/static', express.static(path.join(__dirname, 'static')));
@@ -100,6 +94,13 @@ app.post('/currentuser', async (req, res) => {
   });
 });
 
+// Get system settings
+app.post('/systemsettings', async (req, res) => {
+  res.send({
+    pinauth: PIN_AUTH_ENABLED
+  });
+});
+
 // Get a list of all locations
 app.post('/getstores', async (req, res) => {
   try {
@@ -130,11 +131,11 @@ app.post('/changestore', async (req, res) => {
 async function login(employeenumber, pinnumber) {
   try {
     if (employeenumber === null || typeof employeenumber != 'string' || employeenumber.length < 1) throw 'Employee number is not valid';
-    if (pinnumber === null || typeof pinnumber != 'string' || pinnumber.length < 4) throw 'PIN is incorrect';
+    if (PIN_AUTH_ENABLED && (pinnumber === null || typeof pinnumber != 'string' || pinnumber.length < 4)) throw 'PIN is incorrect';
     let employee = await Employee.findOne({ number: employeenumber.trim() });
     if (!employee) throw 'Employee number is not valid';
     if (employee.disabled) throw 'Access has been disabled for this employee number';
-    if (employee.pin != pinnumber) throw 'PIN is incorrect';
+    if (PIN_AUTH_ENABLED && (employee.pin != pinnumber)) throw 'PIN is incorrect';
     return {
       success: true,
       name: employee.name,
@@ -151,8 +152,8 @@ async function login(employeenumber, pinnumber) {
 // Login API endpoint
 app.post('/login', (req, res) => {
   if (!req.body.employeenumber) return res.send({ error: 'Employee number is not valid' });
-  if (!req.body.pinnumber) return res.send({ error: 'PIN is incorrect' });
-  login(req.body.employeenumber, req.body.pinnumber).then((response) => {
+  if (PIN_AUTH_ENABLED && !req.body.pinnumber) return res.send({ error: 'PIN is incorrect' });
+  login(req.body.employeenumber, PIN_AUTH_ENABLED ? req.body.pinnumber : null).then((response) => {
     if (response.success) {
       // Record the login
       Login.create({
