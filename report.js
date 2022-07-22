@@ -16,8 +16,8 @@ const cron = require('node-cron');
 const excel = require('excel4node');
 
 // Set up mailgun
-const mg_domain = 'mail.zaremski.net';
-const mg_apikey = 'ec83406d9067a3a325eada56b6039bdd-a0cfb957-cc1c2c69';
+const mg_domain = process.env.MG_DOMAIN;
+const mg_apikey = process.env.MG_APIKEY;
 const mailgun = require('mailgun-js')({
   apiKey: mg_apikey,
   domain: mg_domain
