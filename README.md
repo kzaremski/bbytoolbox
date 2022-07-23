@@ -29,3 +29,4 @@ PIN            "yes" or "no", should associates be required to authenticate with
 The app is no longer in use so I have made the source code public.
 
 The code is licensed under the BSD 4-Clause or "old" license.
+See LICENSE for details.
